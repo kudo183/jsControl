@@ -1,0 +1,30 @@
+.h-comboBox-wrapper{
+	position: relative;
+}
+.h-comboBox-wrapper >button{
+    padding: 0px;
+}
+.h-boundlist-wrapper {
+    background: white none repeat scroll 0 0;
+    border-color: #98c0f4;
+    border-style: solid;
+    border-width: 1px;
+	min-width: 165px;
+	max-height: 200px;
+	overflow-y: scroll;
+	position: absolute;
+    top: 25px;
+    transition: all 0.2s ease-in-out 0s;
+    z-index: 1000;
+}
+.h-boundlist-wrapper >ul{
+    padding-left: 5px;
+}
+.h-boundlist-selected{
+	background-color: #0081c2;
+	color: white;
+}
+.h-boundlist-wrapper >ul>li {
+    list-style: outside none none;
+	cursor: default;
+}
