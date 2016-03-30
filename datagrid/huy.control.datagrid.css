@@ -1,0 +1,87 @@
+.table
+{
+	display: table;
+}
+.gridHeader
+{
+	display: table-row;
+	text-align: center;
+	background: rgba(0, 0, 0, 0) -moz-linear-gradient(100% 100% 90deg, #eaeaea, #f8f8f8) repeat scroll 0 0;	
+}
+.row
+{
+	display: table-row;
+}
+.col1 {
+    width: 20px;
+}
+.col2 {
+    width: 70px;
+}
+.col3 {
+    width: 70px;
+}
+.col4 {
+    width: 80px;
+}
+.col5 {
+    width: 80px;
+}
+.col6 {
+    width: 80px;
+}
+.cell
+{
+	display: table-cell;
+	border: solid;
+	border-width: thin;
+	padding: 0px;
+}
+.cell input {
+	width: 100%;
+    border: 0 none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.cell select {
+	width: 100%;
+    border: 0 none;
+    margin: 0px;
+    padding: 0px;
+}
+.cell button {
+	width: 100%;
+    border: 0 none;
+    margin: 0px;
+    padding: 0px;
+}
+.readonly{
+	background-color: #eee;
+}
+.columnFilter{
+	background-color: #FFE3AD;
+}
+.columnFilter input {
+	width: 100%;
+    border: 0 none;
+    margin: 0px;
+    padding: 0px;
+	background-color: #FFE3AD;
+}
+.columnFilter select {
+	width: 100%;
+    border: 0 none;
+    margin: 0px;
+    padding: 0px;
+	background-color: #FFE3AD;
+}
+.columnFilter button {
+	width: 100%;
+    border: 0 none;
+    margin: 0px;
+    padding: 0px;
+	background: #FFE3AD;
+}
+/*jquery ui datepicker size*/
+div.ui-datepicker, .ui-datepicker input{font-size:62.5%;}
