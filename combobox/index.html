@@ -23,7 +23,7 @@
 	<div id="performanceTest"></div>
 	<script>
 		var model = {
-			value: ko.observable(),
+			value: ko.observable(2),
 			items: ko.observableArray()
 		}
 		ko.utils.arrayPushAll(model.items, [{text:"gà",value:1},{text:"mèo",value:2}]);
@@ -31,7 +31,13 @@
 		ko.applyBindings(model, $("#textKO")[0]);
 		function handleClick(){
 			//ko.utils.arrayPushAll(model.items, [{text:"heo",value:3},{text:"cá",value:4}]);
-			model.value($("#inputvalue").val());
+			var v = $("#inputvalue").val();
+			
+			if(v.length > 0){
+				model.value(Number(v));
+			}else{
+				model.value(undefined);
+			}
 			console.log("selectedValue: " + ko.unwrap(model.value));
 		}
 		function handleClick1(){

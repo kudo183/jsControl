@@ -5,7 +5,7 @@
 			initComboBox(element, allBindings);
 		},
 		update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-			ko.unwrap(valueAccessor());			
+			element._setSelectedValue(ko.unwrap(valueAccessor()));
 			console.log("cbSelectedValue update");
 		}
 	};
@@ -16,7 +16,8 @@
 		},
 		update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
 			console.log("cbItems update");			
-			element._setItems(ko.unwrap(valueAccessor()));		
+			element._setItems(ko.unwrap(valueAccessor()));
+			element._setSelectedValue(ko.unwrap(allBindings.get("cbSelectedValue")));			
 		}
 	};
 	
@@ -36,11 +37,36 @@
 		comboBox._ul = {};
 		comboBox._selectedItemIndex = -1;
 		comboBox._isInitialized = true;
-		comboBox._setItems = function setItems(items){
+		comboBox._setItems = function (items){
 			$(comboBox._input).val(undefined);
-			this._items = items;
-			this._filteredItems = items;
-			renderItems(this._ul, items);
+			comboBox._items = items;
+			comboBox._filteredItems = items;
+			renderItems(comboBox._ul, items);
+		};
+		comboBox._setSelectedValue = function (value){
+			var textValue = $(comboBox._input).val();
+			if(typeof value === "undefined" && typeof textValue !== "undefined"){
+				$(comboBox._input).val(undefined);
+				comboBox._filteredItems = comboBox._items;
+				renderItems(comboBox._ul, comboBox._filteredItems);
+				return;
+			}
+			
+			var filteredItems =[];
+			for(var i=0; i<comboBox._items.length;i++){
+				var itemValue = getItemValue(comboBox._items[i]);
+				if(itemValue === value){
+					filteredItems.push(comboBox._items[i]);
+				}
+			}
+			
+			if(filteredItems.length === 0){
+				return;
+			}else{
+				$(comboBox._input).val(getItemText(filteredItems[0]));
+				comboBox._filteredItems = filteredItems;
+				renderItems(comboBox._ul, comboBox._filteredItems);
+			}
 		}		
 		
 		$(comboBox).addClass("h-comboBox-wrapper");
@@ -101,9 +127,11 @@
 		}
 		
 		comboBox._input.onblur = function(){
-			hideListTimer = setTimeout(setValueAndHideList, 300)
-			
-			console.log("isValid when lostFocus:" + $(this)[0].validity.valid);
+			if($(comboBox._listDiv).is(":visible") === true){
+				hideListTimer = setTimeout(setValueAndHideList, 300)
+				
+				console.log("isValid when lostFocus:" + $(this)[0].validity.valid);
+			}
 		}
 		
 		comboBox._button.onclick = function (){
