@@ -70,13 +70,19 @@
 		}		
 		
 		$(comboBox).addClass("h-comboBox-wrapper");
+		var wrapper = window.huy.control.utilsDOM.createElement("div", {}, undefined, undefined, "h-wrapper");
+		var inputWrapper = window.huy.control.utilsDOM.createElement("div", {}, undefined, undefined, "h-input-wrapper");		
 		comboBox._input = window.huy.control.utilsDOM.createElement("input", {type:"text"});
+		var buttonWrapper = window.huy.control.utilsDOM.createElement("div", {}, undefined, undefined, "h-button-wrapper");
 		comboBox._button = window.huy.control.utilsDOM.createElement("button", {tabindex:-1}, undefined, "▼");
-		comboBox._listDiv = window.huy.control.utilsDOM.createElement("div", {style:"display:none;"}, undefined, undefined, "h-boundlist-wrapper");		
+		comboBox._listDiv = window.huy.control.utilsDOM.createElement("div", {style:"display:none;"}, undefined, undefined, "h-boundlist-wrapper");
 		comboBox._ul = window.huy.control.utilsDOM.createElement("ul", {});
 		
-		comboBox.appendChild(comboBox._input);
-		comboBox.appendChild(comboBox._button);
+		inputWrapper.appendChild(comboBox._input);
+		wrapper.appendChild(inputWrapper);
+		buttonWrapper.appendChild(comboBox._button);
+		wrapper.appendChild(buttonWrapper);
+		comboBox.appendChild(wrapper);
 		comboBox._listDiv.appendChild(comboBox._ul);
 		comboBox.appendChild(comboBox._listDiv);
 				
