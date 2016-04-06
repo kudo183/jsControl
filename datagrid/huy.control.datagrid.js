@@ -16,7 +16,7 @@ window.huy.control.dataGrid = (function () {
             rowClicked: function(root, item) {
                 root.previousSelectedItem = ko.utils.unwrapObservable(root.currentSelectedItem);
                 root.currentSelectedItem(item);
-                console.log(JSON.stringify(item));
+                console.log(JSON.stringify(ko.toJS(item)));
                 return true;
             },
             columns: [],
@@ -231,9 +231,9 @@ window.huy.control.dataGrid = (function () {
 
         //comboBox
         cell = createCellDiv();
-        addCell(row, cell, "optionsCaption: caption, options:items, optionsText: itemText, optionsValue: itemValue, value:$parent[cellValueProperty]"
-        , 'comboBox', "select", {});
-
+        addCell(row, cell, "cbSelectedValue: $parent[cellValueProperty], cbItems: items, cbItemText: itemText, cbItemValue: itemValue"
+        , 'comboBox', "div", {});
+		
         //action
         cell = createCellDiv();
         addCell(row, cell, "text:text, click: function(data, event) { action($root, $parent, data, event) }"

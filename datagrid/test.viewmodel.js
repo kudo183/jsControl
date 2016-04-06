@@ -67,8 +67,8 @@ window.app.viewModel.testViewModel = (function () {
 	function load(root){
 		var items = [];
 		items.push(
-			{column1:"11", column2:true, column3: 10, column4: 10, column5:"51"},
-			{column1:"21", column2:false, column3: 11, column4: 10, column5:"52"}
+			createItem("11",true,10,10,"51"),
+			createItem("21",false,11,10,"52")
 		);
 		root.items(items);
 		console.log("load");
@@ -79,8 +79,17 @@ window.app.viewModel.testViewModel = (function () {
 	}
 	
 	function addNewItem(root){
-				root.items.push({column1:"", column2:true, column3: 10, column4: 10, column5:""});
+				root.items.push(createItem("", true, 10, 10, ""));
 		console.log("addNewItem");
 	}
 	
+	function createItem(col1, col2, col3, col4, col5){
+		return {
+			column1:ko.observable(col1),
+			column2:ko.observable(col2),
+			column3:ko.observable(col3),
+			column4:ko.observable(col4),
+			column5:ko.observable(col5),
+		};
+	}
 })();
