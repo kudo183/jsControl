@@ -246,25 +246,25 @@ window.huy.control.dataGrid = (function () {
 	function toString(){
 		var i = 0, text = "";
 		text = text + "previousSelectedItem:\n";
-		text = text + JSON.stringify(this.previousSelectedItem) + "\n";
+		text = text + JSON.stringify(ko.toJS(this.previousSelectedItem)) + "\n";
 		text = text + "currentSelectedItem:\n";
-		text = text + JSON.stringify(ko.utils.unwrapObservable(this.currentSelectedItem)) + "\n";
+		text = text + JSON.stringify(ko.toJS(this.currentSelectedItem)) + "\n";
 		text = text + "filters value:\n";
 		for (i = 0; i < this.columns.length; i++) {
-			text = text + (i + 1) + ". " + ko.utils.unwrapObservable(this.columns[i].filterValue) + "\n";
+			text = text + (i + 1) + ". " + ko.toJS(this.columns[i].filterValue) + "\n";
 		}
 		text = text + "items:\n";
 		var data = ko.utils.unwrapObservable(this.items);
 		for (i = 0; i < data.length; i++) {
-			text = text + (i + 1) + ". " + JSON.stringify(data[i]) + "\n";
+			text = text + (i + 1) + ". " + JSON.stringify(ko.toJS(data[i])) + "\n";
 		}
 		text = text + "itemsRemoved:\n";
 		for (i = 0; i < this.itemsRemoved.length; i++) {
-			text = text + (i + 1) + ". " + JSON.stringify(this.itemsRemoved[i]) + "\n";
+			text = text + (i + 1) + ". " + JSON.stringify(ko.toJS(this.itemsRemoved[i])) + "\n";
 		}
 		text = text + "columns:\n";
 		for (i = 0; i < this.columns.length; i++) {
-			text = text + (i + 1) + ". " + JSON.stringify(this.columns[i]) + "\n";
+			text = text + (i + 1) + ". " + JSON.stringify(ko.toJS(this.columns[i])) + "\n";
 		}
 		return text;
 	}
