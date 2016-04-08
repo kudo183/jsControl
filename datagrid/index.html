@@ -16,6 +16,7 @@
 	<script type='text/javascript' src='huy.control.datagrid.js'></script>
 	<script type='text/javascript' src='test.viewmodel.js'></script>
 	<div id="test"></div>
+	<button onclick="console.log(window.app.viewModel.testViewModel.toString());">Test</button>
 	<script>
 		var view = huy.control.dataGrid.createView("dataGrid");
 		$("#test").append(view);
