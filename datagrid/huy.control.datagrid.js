@@ -13,10 +13,11 @@ window.huy.control.dataGrid = (function () {
             itemsRemoved: [],
             currentSelectedItem: ko.observable(),
             previousSelectedItem: { },
-            rowClicked: function(root, item) {
+            rowClicked: function(root, index, item) {
                 root.previousSelectedItem = ko.utils.unwrapObservable(root.currentSelectedItem);
                 root.currentSelectedItem(item);
                 console.log(JSON.stringify(ko.toJS(item)));
+				console.log(index);
                 return true;
             },
             columns: [],
@@ -125,10 +126,10 @@ window.huy.control.dataGrid = (function () {
         addCell(row, cell, "checked:filterValue", 'checkBox', "input", { type: "checkbox" });
 
         //comboBox
-        cell = createColumnFilterCellDiv();
-        addCell(row, cell, "optionsCaption: caption, options:items, optionsText: itemText, optionsValue: itemValue, value:filterValue"
-        , 'comboBox', "select", {});
-
+        cell = createCellDiv();
+        addCell(row, cell, "cbSelectedValue: filterValue, cbItems: items, cbItemText: itemText, cbItemValue: itemValue"
+        , 'comboBox', "div", {});
+		
         //action
         cell = createColumnFilterCellDiv();
         addCell(row, cell, "text:text, click: function(data, event) { action($root, 'filter', data, event) }"
@@ -188,9 +189,9 @@ window.huy.control.dataGrid = (function () {
     function createGridRow(style) {
         var row, cell;
         if (style === "row") {
-            row = window.huy.control.utilsDOM.createElement("div", {}, "click: function(data, event){return $root.rowClicked($root, data, event)}, foreach: $parent.columns, css: css", undefined, "row");
+            row = window.huy.control.utilsDOM.createElement("div", {}, "click: function(data, event){return $root.rowClicked($root, $index(), data, event)}, foreach: $parent.columns, css: css", undefined, "row");
         } else {
-            row = window.huy.control.utilsDOM.createElement("div", {}, "click: function(data, event){return $root.rowClicked($root, data, event)}, foreach: $parent.columns", undefined, "row");
+            row = window.huy.control.utilsDOM.createElement("div", {}, "click: function(data, event){return $root.rowClicked($root, $index(), data, event)}, foreach: $parent.columns", undefined, "row");
         }
 
         //readonly text
