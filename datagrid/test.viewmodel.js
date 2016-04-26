@@ -1,95 +1,69 @@
 ﻿window.app = window.app || {};
 window.app.viewModel = window.app.viewModel || {};
 window.app.viewModel.testViewModel = (function () {
-    var viewModel = huy.control.dataGrid.createViewModel(load, save, addNewItem);
-	viewModel.columns.push({
+    var viewModel = huy.control.dataGrid.createViewModel(window.app.fakeDataProvider);
+    viewModel.addColumn({
         headerText: "Col1",
-		type: "span",
+        type: "span",
         cellValueProperty: "column1",
-		readOnly: true,
-		filterValue: ko.observable()
+        readOnly: true,
+        order: 0,
+        filterValue: ko.observable()
     });
-	viewModel.columns.push({
+    viewModel.addColumn({
         headerText: "Col2",
-        type: "checkBox",
+        type: "textBox",
         cellValueProperty: "column2",
         readOnly: false,
-		filterValue: ko.observable()
+        order: 0,
+        filterValue: ko.observable()
     });
-	viewModel.columns.push({
+    viewModel.addColumn({
         headerText: "Col3",
-        type: "comboBox",
+        type: "checkBox",
         cellValueProperty: "column3",
-		readOnly: false,
-        items: [{
-            itemText: "list10",
-            itemValue: 10
-        }, {
-            itemText: "list11",
-            itemValue: 11
-        }],
-        itemText: "itemText",
-        itemValue: "itemValue",
-        caption: "...",
-		filterValue: ko.observable()
+        readOnly: false,
+        order: 0,
+        filterValue: ko.observable()
     });
-	viewModel.columns.push({
+    
+    var items = [];
+    for(var i=1; i<=105;i++){
+        items.push({itemText:"item " + i, itemValue: i});
+    }
+    viewModel.addColumn({
         headerText: "Col4",
-        type: "template",
-		filterTemplate:"filterTemplate",
-		cellTemplate:"cellTemplate",
+        type: "comboBox",
         cellValueProperty: "column4",
-		readOnly: false,
-        items: [{
-            itemText: "list10",
-            itemValue: 10
-        }, {
-            itemText: "list11",
-            itemValue: 11
-        }],
+        readOnly: false,
+        items: items,
         itemText: "itemText",
         itemValue: "itemValue",
         caption: "...",
-		filterValue: ko.observable()
+        filterValue: ko.observable()
     });
-	document.write('<script type="text/html" id="cellTemplate"><select data-bind="optionsCaption: caption, options:items, optionsText: itemText, optionsValue: itemValue, value: $parent[cellValueProperty]"></select></script>');
-	document.write('<script type="text/html" id="filterTemplate"><select data-bind="optionsCaption: caption, options:items, optionsText: itemText, optionsValue: itemValue, value: filterValue"></select></script>');
-	
-	viewModel.columns.push({
-        headerText: "Col5",
-        type: "textBox",
-		cellValueProperty: "column5",
-		readOnly: false,
-		filterValue: ko.observable()
-    });
-	return viewModel;
-	
-	function load(root){
-		var items = [];
-		items.push(
-			createItem("11",true,10,10,"51"),
-			createItem("21",false,11,10,"52")
-		);
-		root.items(items);
-		console.log("load");
-	}
-	
-	function save(){
-		console.log("save");
-	}
-	
-	function addNewItem(root){
-				root.items.push(createItem("", true, 10, 10, ""));
-		console.log("addNewItem");
-	}
-	
-	function createItem(col1, col2, col3, col4, col5){
-		return {
-			column1:ko.observable(col1),
-			column2:ko.observable(col2),
-			column3:ko.observable(col3),
-			column4:ko.observable(col4),
-			column5:ko.observable(col5),
-		};
-	}
+    
+    // viewModel.addColumn({
+        // headerText: "Col4",
+        // type: "template",
+        // filterTemplate:"filterTemplate",
+        // cellTemplate:"cellTemplate",
+        // cellValueProperty: "column4",
+        // readOnly: false,
+        // items: [{
+            // itemText: "list10",
+            // itemValue: 10
+        // }, {
+            // itemText: "list11",
+            // itemValue: 11
+        // }],
+        // itemText: "itemText",
+        // itemValue: "itemValue",
+        // caption: "...",
+        // filterValue: ko.observable()
+    // });
+    // document.write('<script type="text/html" id="cellTemplate"><select data-bind="optionsCaption: caption, options:items, optionsText: itemText, optionsValue: itemValue, value: $parent[cellValueProperty]"></select></script>');
+    // document.write('<script type="text/html" id="filterTemplate"><select data-bind="optionsCaption: caption, options:items, optionsText: itemText, optionsValue: itemValue, value: filterValue"></select></script>');
+    
+    return viewModel;   
 })();
