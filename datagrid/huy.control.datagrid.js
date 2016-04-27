@@ -272,6 +272,10 @@ window.huy.control.dataGrid = (function () {
             addColumnFilterCell(row, cell, "cbSelectedValue: filterValue, cbItems: items, cbItemText: itemText, cbItemValue: itemValue"
             , 'comboBox', "div", {});
             
+            //date
+            cell = createColumnFilterCellDiv();
+            addColumnFilterCell(row, cell, "datepicker:filterValue", 'date', "input", {});
+            
             //action
             cell = createColumnFilterCellDiv();
             addCell(row, cell, "text:text, click: function(data, event) { action($root, 'filter', data, event) }"
@@ -355,6 +359,10 @@ window.huy.control.dataGrid = (function () {
             addCell(row, cell, "cbSelectedValue: $parent[cellValueProperty], cbItems: items, cbItemText: itemText, cbItemValue: itemValue"
             , 'comboBox', "div", {});
             
+            //date
+            cell = createCellDiv();
+            addCell(row, cell, "datepicker:$parent[cellValueProperty], disable:readOnly", 'date', "input", {});
+
             //action
             cell = createCellDiv();
             addCell(row, cell, "text:text, click: function(data, event) { action($root, $parent, data, event) }"

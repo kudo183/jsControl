@@ -42,7 +42,13 @@ window.app.viewModel.testViewModel = (function () {
         caption: "...",
         filterValue: ko.observable()
     });
-    
+    viewModel.addColumn({
+        headerText: "Col5",
+        type: "date",
+        cellValueProperty: "column5",
+        readOnly: false,
+        filterValue: ko.observable()
+    });
     // viewModel.addColumn({
         // headerText: "Col4",
         // type: "template",

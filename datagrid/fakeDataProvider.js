@@ -13,13 +13,16 @@ window.app.fakeDataProvider = (function(){
         saveChangesAjax: saveChangesAjax
     };
     
+    var d = new Date();
+    d.setHours(0,0,0,0)
     for(var i=1; i<=105;i++){
+        d.setDate(d.getDate() + 1);
         dataProvider._items.push({
             column1:ko.observable(i),
             column2:ko.observable("text " + i),
             column3:ko.observable((i&1) === 0),
             column4:ko.observable(i),
-            column5:ko.observable(new Date()),
+            column5:ko.observable(new Date(d)),
         });
     }
     return dataProvider;
