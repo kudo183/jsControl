@@ -174,7 +174,12 @@ window.huy.control.dataGrid = (function () {
         
         function addColumn(column){
             viewModel._columns.push(column);
-            column.filterValue.subscribe(function(){viewModel.load(viewModel)});
+            column.filterValue.subscribe(function(){
+                viewModel._isSkipLoadFunction = true;
+                viewModel.paging.currentPageIndex(1);
+                viewModel._isSkipLoadFunction = false;
+                viewModel.load(viewModel);
+            });
         }
         
         function createPagingObject(){
