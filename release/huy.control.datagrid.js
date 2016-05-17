@@ -120,6 +120,8 @@ window.huy.control.dataGrid = (function () {
                 root._isSkipLoadFunction = true;
                 root.paging.pageCount(result.pageCount);
                 root.paging.currentPageIndex(result.pageIndex);
+                root.itemsRemoved = [];
+                root.itemsAdded = [];
                 root._isSkipLoadFunction = false;
             }, function(error){
                 console.log("getItems error: " + JSON.stringify(error));
@@ -133,7 +135,7 @@ window.huy.control.dataGrid = (function () {
         }
         
         function save(root){
-            console.log("save")
+            console.log("save");
             var changes = [];
 
             var uItems = ko.unwrap(root.items);
