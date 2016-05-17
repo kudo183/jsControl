@@ -143,20 +143,20 @@ window.huy.control.dataGrid = (function () {
                 item = uItems[i];
                 if (ko.unwrap(root._dataProvider.getItemId(item)) !== 0 &&
                     item._changed === true) {
-                    changes.push({ actionType: "~", data: root._dataProvider.toEntity(item) });
+                    changes.push({ state: "u", data: root._dataProvider.toEntity(item) });
                 }
             }
 
             var itemsAdded = root.itemsAdded;
             for (i = 0; i < itemsAdded.length; i++) {
                 item = itemsAdded[i];
-                changes.push({ actionType: "+", data: root._dataProvider.toEntity(item) });
+                changes.push({ state: "a", data: root._dataProvider.toEntity(item) });
             }
 
             var itemsRemoved = root.itemsRemoved;
             for (i = 0; i < itemsRemoved.length; i++) {
                 item = itemsRemoved[i];
-                changes.push({ actionType: "-", data: root._dataProvider.toEntity(item) });
+                changes.push({ state: "d", data: root._dataProvider.toEntity(item) });
             }
             
             root._dataProvider.saveChangesAjax(changes, function(result){
