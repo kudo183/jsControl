@@ -69,7 +69,7 @@
 			}
 		}		
 		
-		$(comboBox).addClass("h-comboBox-wrapper");
+		$(comboBox).addClass("h-comboBox");
 		var wrapper = window.huy.control.utilsDOM.createElement("div", {}, undefined, undefined, "h-wrapper");
 		var inputWrapper = window.huy.control.utilsDOM.createElement("div", {}, undefined, undefined, "h-input-wrapper");		
 		comboBox._input = window.huy.control.utilsDOM.createElement("input", {type:"text"});

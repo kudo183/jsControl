@@ -237,7 +237,7 @@ window.huy.control.dataGrid = (function () {
     }
     
     function createView(id, style) {
-        var view = window.huy.control.utilsDOM.createElement("div", { id: id });
+        var view = window.huy.control.utilsDOM.createElement("div", { id: id }, undefined, undefined, "h-dataGrid");
         view.appendChild(createHeader());
         view.appendChild(createColumnFilter());
         view.appendChild(createGridViewContent(style));
