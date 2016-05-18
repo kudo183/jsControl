@@ -1,87 +1,93 @@
-.table
-{
-	display: table;
+.h-dataGrid button {
+    border: 0 none;
+    margin: 2px;
+    padding: 3px 2px;
+    cursor: pointer;
+    width: 40px;
 }
-.gridHeader
+
+.h-dataGrid .table
 {
-	display: table-row;
-	text-align: center;
-	background: rgba(0, 0, 0, 0) -moz-linear-gradient(100% 100% 90deg, #eaeaea, #f8f8f8) repeat scroll 0 0;	
+    display: table;
 }
-.row
+.h-dataGrid .gridHeader
 {
-	display: table-row;
+    display: table-row;
+    text-align: center;
+    background: rgba(0, 0, 0, 0) -moz-linear-gradient(100% 100% 90deg, #eaeaea, #f8f8f8) repeat scroll 0 0;	
 }
-.col1 {
+.h-dataGrid .row
+{
+    display: table-row;
+}
+.h-dataGrid .col1 {
     width: 20px;
 }
-.col2 {
+.h-dataGrid .col2 {
     width: 70px;
 }
-.col3 {
+.h-dataGrid .col3 {
     width: 70px;
 }
-.col4 {
+.h-dataGrid .col4 {
     width: 80px;
 }
-.col5 {
+.h-dataGrid .col5 {
     width: 80px;
 }
-.col6 {
+.h-dataGrid .col6 {
     width: 80px;
 }
-.cell
-{
-	display: table-cell;
-	border: solid;
-	border-width: thin;
-	padding: 0px;
+.h-dataGrid .cell {
+    display: table-cell;
+    border: 1px solid #e8eef4;
+    padding: 2px;
 }
-.cell input {
-	width: 100%;
+.h-dataGrid .cell input {
+    width: 100%;
     border: 0 none;
     margin: 0px;
     padding: 0px;
 }
 
-.cell select {
-	width: 100%;
+.h-dataGrid .cell select {
+    width: 100%;
     border: 0 none;
     margin: 0px;
     padding: 0px;
 }
-.cell button {
-	width: 100%;
+.h-dataGrid .cell button {
+    width: 100%;
     border: 0 none;
     margin: 0px;
     padding: 0px;
 }
-.readonly{
-	background-color: #eee;
+.h-dataGrid .readonly{
+    background-color: #eee;
 }
-.columnFilter{
-	background-color: #FFE3AD;
+.h-dataGrid .columnFilter{
+    background-color: #FFE3AD;
 }
-.columnFilter input {
-	width: 100%;
+.h-dataGrid .columnFilter input {
+    width: 100%;
     border: 0 none;
     margin: 0px;
     padding: 0px;
-	background-color: #FFE3AD;
+    background-color: #FFE3AD;
 }
-.columnFilter select {
-	width: 100%;
+.h-dataGrid .columnFilter select {
+    width: 100%;
     border: 0 none;
     margin: 0px;
     padding: 0px;
-	background-color: #FFE3AD;
+    background-color: #FFE3AD;
 }
-.columnFilter button {
-	width: 100%;
+.h-dataGrid .columnFilter button {
+    width: 100%;
     border: 0 none;
     margin: 0px;
     padding: 0px;
-	background: #FFE3AD;
+    background: #FFE3AD;
 }
 /*jquery ui datepicker size*/
 div.ui-datepicker, .ui-datepicker input{font-size:62.5%;}
