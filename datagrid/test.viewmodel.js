@@ -27,16 +27,12 @@ window.app.viewModel.testViewModel = (function () {
         filterValue: ko.observable()
     });
     
-    var items = [];
-    for(var i=1; i<=105;i++){
-        items.push({itemText:"item " + i, itemValue: i});
-    }
     viewModel.addColumn({
         headerText: "Col4",
         type: "comboBox",
         cellValueProperty: "column4",
         readOnly: false,
-        items: items,
+        itemsSourceName: "comboBoxItems",
         itemText: "itemText",
         itemValue: "itemValue",
         caption: "...",

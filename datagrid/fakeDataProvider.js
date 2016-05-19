@@ -89,6 +89,13 @@ window.app.fakeDataProvider = (function(){
         }
         
         result.pageIndex = pageIndex;
+        
+        var items = [];
+        for(var i=1; i<=105;i++){
+            items.push({itemText:"item " + i, itemValue: i});
+        }
+        result.comboBoxItemsSource = {};
+        result.comboBoxItemsSource.comboBoxItems = items;
         return result;          
     }
     

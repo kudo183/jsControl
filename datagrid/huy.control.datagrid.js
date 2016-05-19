@@ -12,9 +12,10 @@ window.huy.control.dataGrid = (function () {
             items: ko.observableArray(),
             itemsRemoved: [],
             itemsAdded: [],
+            comboBoxItemsSource: {},
             currentSelectedItem: ko.observable(),
             previousSelectedItem: {},
-            _rowClicked: function(root, index, item) {
+            _rowClicked: function (root, index, item) {
                 root.previousSelectedItem = ko.unwrap(root.currentSelectedItem);
                 root.currentSelectedItem(item);
                 console.log(JSON.stringify(ko.toJS(item)));
@@ -28,9 +29,9 @@ window.huy.control.dataGrid = (function () {
             buttons: [
                 {
                     text: "Add",
-                    action: function (root){
+                    action: function (root) {
                         var item = {};
-                        for(var i=1; i<root._columns.length; i++){
+                        for (var i = 1; i < root._columns.length; i++) {
                             item[root._columns[i].cellValueProperty] = ko.observable();
                             console.log(root._columns[i].cellValueProperty);
                         }
@@ -66,75 +67,80 @@ window.huy.control.dataGrid = (function () {
                         root._columns[i].filterValue(undefined);
                     }
                     root._isSkipLoadFunction = false;
-                    root.load(root)
+                    root.load(root);
                 } else {
                     root.itemsRemoved.push(item);
                     root.items.remove(item);
                 }
             }
         });
-        
-        viewModel.paging.currentPageIndex.subscribe(function(){viewModel.load(viewModel)});
-        
+
+        viewModel.paging.currentPageIndex.subscribe(function () { viewModel.load(viewModel); });
+
         return viewModel;
-    
-        function load(root){
-            if(root._isSkipLoadFunction === true){
+
+        function load(root) {
+            if (root._isSkipLoadFunction === true) {
                 return;
             }
             console.log("load");
             var filter = {};
             filter.whereOptions = [];
-            for(var i=0; i<root._columns.length; i++){
+            for (var i = 0; i < root._columns.length; i++) {
                 var c = root._columns[i];
                 var v = ko.unwrap(c.filterValue);
-                if(v !== undefined){
+                if (v !== undefined) {
                     filter.whereOptions.push({
                         predicate: "=",
                         propertyPath: c.cellValueProperty,
                         value: v
-                    })
+                    });
                 }
             }
             filter.orderOptions = [];
-            for(var i=0; i<root._columns.length; i++){
+            for (var i = 0; i < root._columns.length; i++) {
                 var c = root._columns[i];
-                if(c.order === 1){
-                    filter.orderOptions.push({propertyPath: c.cellValueProperty, isAscending: true})
-                }else if(c.order === -1){
-                    filter.orderOptions.push({propertyPath: c.cellValueProperty, isAscending: false})
+                if (c.order === 1) {
+                    filter.orderOptions.push({ propertyPath: c.cellValueProperty, isAscending: true });
+                } else if (c.order === -1) {
+                    filter.orderOptions.push({ propertyPath: c.cellValueProperty, isAscending: false });
                 }
             }
             filter.pageIndex = root.paging.currentPageIndex();
-            
-            root._dataProvider.getItemsAjax(filter, function(result){
+
+            root._dataProvider.getItemsAjax(filter, function (result) {
                 root.items(result.items);
-                for(var i=0; i<result.items.length; i++){
+                for (var i = 0; i < result.items.length; i++) {
                     var item = result.items[i];
-                    for(var j=0; j<root._columns.length; j++){
-                        if(root._columns[j].readOnly === false){
+                    for (var j = 0; j < root._columns.length; j++) {
+                        if (root._columns[j].readOnly === false) {
                             addChangeTracking(item, root._columns[j].cellValueProperty);
                         }
                     }
                 }
+
+                for (var d in result.comboBoxItemsSource) {
+                    root.comboBoxItemsSource[d](result.comboBoxItemsSource[d]);
+                }
+                
                 root._isSkipLoadFunction = true;
                 root.paging.pageCount(result.pageCount);
                 root.paging.currentPageIndex(result.pageIndex);
                 root.itemsRemoved = [];
                 root.itemsAdded = [];
                 root._isSkipLoadFunction = false;
-            }, function(error){
+            }, function (error) {
                 console.log("getItems error: " + JSON.stringify(error));
-            });         
+            });
         }
-        
-        function addChangeTracking(item, property){
-            item[property].subscribe(function(){
+
+        function addChangeTracking(item, property) {
+            item[property].subscribe(function () {
                 item._changed = true;
             });
         }
-        
-        function save(root){
+
+        function save(root) {
             console.log("save");
             var changes = [];
 
@@ -160,8 +166,8 @@ window.huy.control.dataGrid = (function () {
                 item = itemsRemoved[i];
                 changes.push({ state: "d", data: root._dataProvider.toEntity(item) });
             }
-            
-            root._dataProvider.saveChangesAjax(changes, function(result){
+
+            root._dataProvider.saveChangesAjax(changes, function (result) {
                 for (i = 0; i < itemsAdded.length; i++) {
                     root._dataProvider.setItemId(root.itemsAdded[i], result[i]);
                 }
@@ -173,43 +179,46 @@ window.huy.control.dataGrid = (function () {
                 }
             });
         }
-        
-        function addColumn(column){
+
+        function addColumn(column) {
             viewModel._columns.push(column);
-            column.filterValue.subscribe(function(){
+            if (column.type === "comboBox") {
+                viewModel.comboBoxItemsSource[column.itemsSourceName] = ko.observableArray();
+            }
+            column.filterValue.subscribe(function () {
                 viewModel._isSkipLoadFunction = true;
                 viewModel.paging.currentPageIndex(1);
                 viewModel._isSkipLoadFunction = false;
                 viewModel.load(viewModel);
             });
         }
-        
-        function createPagingObject(){
+
+        function createPagingObject() {
             return {
                 currentPageIndex: ko.observable(1),
                 pageCount: ko.observable(0),
-                next: function(root) {
+                next: function (root) {
                     var index = Number(root.paging.currentPageIndex());
                     if (index < root.paging.pageCount()) {
                         root.paging.currentPageIndex(index + 1);
                     }
                 },
-                prev: function(root) {
+                prev: function (root) {
                     var index = Number(root.paging.currentPageIndex());
                     if (index > 1) {
                         root.paging.currentPageIndex(index - 1);
                     }
                 },
-                first: function(root) {
+                first: function (root) {
                     root.paging.currentPageIndex(1);
                 },
-                last: function(root) {
+                last: function (root) {
                     root.paging.currentPageIndex(root.paging.pageCount());
                 }
             };
         }
-        
-        function toString(){
+
+        function toString() {
             var i = 0, text = "";
             text = text + "previousSelectedItem:\n";
             text = text + JSON.stringify(ko.toJS(this.previousSelectedItem)) + "\n";
@@ -235,7 +244,7 @@ window.huy.control.dataGrid = (function () {
             return text;
         }
     }
-    
+
     function createView(id, style) {
         var view = window.huy.control.utilsDOM.createElement("div", { id: id }, undefined, undefined, "h-dataGrid");
         view.appendChild(createHeader());
@@ -276,13 +285,13 @@ window.huy.control.dataGrid = (function () {
 
             //comboBox
             cell = createColumnFilterCellDiv();
-            addColumnFilterCell(row, cell, "cbSelectedValue: filterValue, cbItems: items, cbItemText: itemText, cbItemValue: itemValue"
+            addColumnFilterCell(row, cell, "cbSelectedValue: filterValue, cbItems: $root.comboBoxItemsSource[itemsSourceName], cbItemText: itemText, cbItemValue: itemValue"
             , 'comboBox', "div", {});
-            
+
             //date
             cell = createColumnFilterCellDiv();
             addColumnFilterCell(row, cell, "datepicker:filterValue", 'date', "input", {});
-            
+
             //action
             cell = createColumnFilterCellDiv();
             addCell(row, cell, "text:text, click: function(data, event) { action($root, 'filter', data, event) }"
@@ -363,9 +372,9 @@ window.huy.control.dataGrid = (function () {
 
             //comboBox
             cell = createCellDiv();
-            addCell(row, cell, "cbSelectedValue: $parent[cellValueProperty], cbItems: items, cbItemText: itemText, cbItemValue: itemValue"
+            addCell(row, cell, "cbSelectedValue: $parent[cellValueProperty], cbItems: $root.comboBoxItemsSource[itemsSourceName], cbItemText: itemText, cbItemValue: itemValue"
             , 'comboBox', "div", {});
-            
+
             //date
             cell = createCellDiv();
             addCell(row, cell, "datepicker:$parent[cellValueProperty], disable:readOnly", 'date', "input", {});
@@ -392,7 +401,7 @@ window.huy.control.dataGrid = (function () {
             cell.appendChild(cellContent);
             row.appendChild(window.huy.control.utilsDOM.createComment("/ko"));
         }
-        
+
         function addColumnFilterCell(row, cell, cellDataBind, type, htmlElement, attrs) {
             var cellContent = window.huy.control.utilsDOM.createElement(htmlElement, attrs, cellDataBind);
             var s = "ko if:type==='{0}'";
@@ -401,12 +410,12 @@ window.huy.control.dataGrid = (function () {
             var buttonWrapper = window.huy.control.utilsDOM.createElement("div", {}, undefined, undefined, "h-button-wrapper");
             var inputWrapper = window.huy.control.utilsDOM.createElement("div", {}, undefined, undefined, "h-input-wrapper");
             var xButton = window.huy.control.utilsDOM.createElement("button", {}, "click: function(data, event) { data.filterValue(undefined); }", "x");
-            
+
             buttonWrapper.appendChild(xButton);
             inputWrapper.appendChild(cellContent);
             wrapper.appendChild(buttonWrapper);
             wrapper.appendChild(inputWrapper);
-            
+
             row.appendChild(cell);
             cell.appendChild(wrapper);
             row.appendChild(window.huy.control.utilsDOM.createComment("/ko"));
@@ -420,7 +429,7 @@ window.huy.control.dataGrid = (function () {
         function createColumnFilterCellDiv() {
             //css class ex:'col1 columnFilter'
             return window.huy.control.utilsDOM.createElement("div", {}, "css:'col'+($index()+1) + ' columnFilter'", undefined, "cell");
-        }   
+        }
     }
-    
+
 })();
