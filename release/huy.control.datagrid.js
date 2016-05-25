@@ -7,7 +7,11 @@ window.huy.control.dataGrid = (function () {
     };
     return dataGrid;
 
-    function createViewModel(dataProvider) {
+    function createViewModel(dataProvider, settings) {
+        settings = settings || {
+            hasDeleteButton: true
+        };
+
         var viewModel = {
             items: ko.observableArray(),
             itemsRemoved: [],
@@ -22,6 +26,8 @@ window.huy.control.dataGrid = (function () {
                 console.log(index);
                 return true;
             },
+            addCustomFilters: addCustomFilters,
+            _customFilter: [],
             addColumn: addColumn,
             _columns: [],
             enablePaging: ko.observable(true),
@@ -54,26 +60,28 @@ window.huy.control.dataGrid = (function () {
             toString: toString
         };
 
-        viewModel._columns.push({
-            headerText: "",
-            type: "action",
-            text: "x",
-            readOnly: true,
-            filterValue: ko.observable(),
-            action: function (root, item) {
-                if (item === "filter") {
-                    root._isSkipLoadFunction = true;
-                    for (var i = 0; i < root._columns.length; i++) {
-                        root._columns[i].filterValue(undefined);
+        if (settings.hasDeleteButton === true) {
+            viewModel._columns.push({
+                headerText: "",
+                type: "action",
+                text: "x",
+                readOnly: true,
+                filterValue: ko.observable(),
+                action: function (root, item) {
+                    if (item === "filter") {
+                        root._isSkipLoadFunction = true;
+                        for (var i = 0; i < root._columns.length; i++) {
+                            root._columns[i].filterValue(undefined);
+                        }
+                        root._isSkipLoadFunction = false;
+                        root.load(root);
+                    } else {
+                        root.itemsRemoved.push(item);
+                        root.items.remove(item);
                     }
-                    root._isSkipLoadFunction = false;
-                    root.load(root);
-                } else {
-                    root.itemsRemoved.push(item);
-                    root.items.remove(item);
                 }
-            }
-        });
+            });
+        }
 
         viewModel.paging.currentPageIndex.subscribe(function () { viewModel.load(viewModel); });
 
@@ -93,6 +101,17 @@ window.huy.control.dataGrid = (function () {
                     filter.whereOptions.push({
                         predicate: "=",
                         propertyPath: c.cellValueProperty,
+                        value: v
+                    });
+                }
+            }
+            for (var i = 0; i < root._customFilter.length; i++) {
+                var c = root._customFilter[i];
+                var v = ko.unwrap(c.filterValue);
+                if (v !== undefined) {
+                    filter.whereOptions.push({
+                        predicate: "=",
+                        propertyPath: c.propertyPath,
                         value: v
                     });
                 }
@@ -122,7 +141,7 @@ window.huy.control.dataGrid = (function () {
                 for (var d in result.comboBoxItemsSource) {
                     root.comboBoxItemsSource[d](result.comboBoxItemsSource[d]);
                 }
-                
+
                 root._isSkipLoadFunction = true;
                 root.paging.pageCount(result.pageCount);
                 root.paging.currentPageIndex(result.pageIndex);
@@ -180,10 +199,28 @@ window.huy.control.dataGrid = (function () {
             });
         }
 
+        function addCustomFilters(customFilters) {
+            for (var i = 0; i < customFilters.length; i++) {
+                var customFilter = customFilters[i];
+                viewModel._customFilter.push(customFilter);
+                if (customFilter.type === "comboBox") {
+                    viewModel.comboBoxItemsSource[customFilter.itemsSourceName] =
+                        viewModel.comboBoxItemsSource[customFilter.itemsSourceName] || ko.observableArray();
+                }
+                customFilter.filterValue.subscribe(function () {
+                    viewModel._isSkipLoadFunction = true;
+                    viewModel.paging.currentPageIndex(1);
+                    viewModel._isSkipLoadFunction = false;
+                    viewModel.load(viewModel);
+                });
+            }
+        }
+
         function addColumn(column) {
             viewModel._columns.push(column);
             if (column.type === "comboBox") {
-                viewModel.comboBoxItemsSource[column.itemsSourceName] = ko.observableArray();
+                viewModel.comboBoxItemsSource[column.itemsSourceName] =
+                    viewModel.comboBoxItemsSource[column.itemsSourceName] || ko.observableArray();
             }
             column.filterValue.subscribe(function () {
                 viewModel._isSkipLoadFunction = true;
@@ -245,15 +282,71 @@ window.huy.control.dataGrid = (function () {
         }
     }
 
-    function createView(id, style) {
+    function createView(id, settings, style) {
+        settings = settings || {
+            hasCustomFilter: false,
+            hasColumnHeader: true,
+            hasColumnFilter: true,
+            hasBottomToolbar: true
+        };
+
         var view = window.huy.control.utilsDOM.createElement("div", { id: id }, undefined, undefined, "h-dataGrid");
-        view.appendChild(createHeader());
-        view.appendChild(createColumnFilter());
+
+        if (settings.hasCustomFilter === true) {
+            view.appendChild(createCustomFilter());
+        }
+        if (settings.hasColumnHeader === true) {
+            view.appendChild(createColumnHeader());
+        }
+        if (settings.hasColumnFilter === true) {
+            view.appendChild(createColumnFilter());
+        }
         view.appendChild(createGridViewContent(style));
-        view.appendChild(createBottomToolbar());
+        if (settings.hasBottomToolbar === true) {
+            view.appendChild(createBottomToolbar());
+        }
         return view;
 
-        function createHeader() {
+        function createCustomFilter() {
+            var row, cell;
+            row = window.huy.control.utilsDOM.createElement("div", {}, "foreach: _customFilter", undefined, "gridCustomFilter");
+
+            //readonly text
+            cell = createCustomFilterCellDiv();
+            addColumnFilterCell(row, cell, "value:filterValue", 'span', "input", {});
+
+            //text text
+            cell = createCustomFilterCellDiv();
+            addColumnFilterCell(row, cell, "value:filterValue", 'textBox', "input", {});
+
+            //checkBox
+            cell = createCustomFilterCellDiv();
+            addColumnFilterCell(row, cell, "checked:filterValue", 'checkBox', "input", { type: "checkbox" });
+
+            //comboBox
+            cell = createCustomFilterCellDiv();
+            addColumnFilterCell(row, cell, "cbSelectedValue: filterValue, cbItems: $root.comboBoxItemsSource[itemsSourceName], cbItemText: itemText, cbItemValue: itemValue"
+            , 'comboBox', "div", {});
+
+            //date
+            cell = createCustomFilterCellDiv();
+            addColumnFilterCell(row, cell, "datepicker:filterValue", 'date', "input", {});
+
+            //action
+            cell = createCustomFilterCellDiv();
+            addCell(row, cell, "text:text, click: function(data, event) { action($root, 'filter', data, event) }"
+            , 'action', "button", {});
+
+            //template
+            cell = window.huy.control.utilsDOM.createElement("div", {}, "template: {name: filterTemplate}", undefined, "customFilterCell");
+            row.appendChild(window.huy.control.utilsDOM.createComment("ko if:type==='template'"));
+            row.appendChild(cell);
+            row.appendChild(window.huy.control.utilsDOM.createComment("/ko"));
+
+            return row;
+        }
+
+        function createColumnHeader() {
             var view = window.huy.control.utilsDOM.createElement("div", {}, undefined, undefined, "gridHeader");
             var koItems = window.huy.control.utilsDOM.createComment("ko foreach: _columns");
             var cell = window.huy.control.utilsDOM.createElement("div", {}, "css: 'col'+($index()+1)", undefined, "cell");
@@ -421,6 +514,26 @@ window.huy.control.dataGrid = (function () {
             row.appendChild(window.huy.control.utilsDOM.createComment("/ko"));
         }
 
+
+        function addCustomFilterCell(row, cell, cellDataBind, type, htmlElement, attrs) {
+            var cellContent = window.huy.control.utilsDOM.createElement(htmlElement, attrs, cellDataBind);
+            var s = "ko if:type==='{0}'";
+            row.appendChild(window.huy.control.utilsDOM.createComment(s.replace("{0}", type)));
+            var wrapper = window.huy.control.utilsDOM.createElement("div", {}, undefined, undefined, "h-wrapper");
+            var buttonWrapper = window.huy.control.utilsDOM.createElement("div", {}, undefined, undefined, "h-button-wrapper");
+            var inputWrapper = window.huy.control.utilsDOM.createElement("div", {}, undefined, undefined, "h-input-wrapper");
+            var xButton = window.huy.control.utilsDOM.createElement("button", {}, "click: function(data, event) { data.filterValue(undefined); }", "x");
+
+            buttonWrapper.appendChild(xButton);
+            inputWrapper.appendChild(cellContent);
+            wrapper.appendChild(buttonWrapper);
+            wrapper.appendChild(inputWrapper);
+
+            row.appendChild(cell);
+            cell.appendChild(wrapper);
+            row.appendChild(window.huy.control.utilsDOM.createComment("/ko"));
+        }
+
         function createCellDiv() {
             //css class ex: 'col1 readonly'
             return window.huy.control.utilsDOM.createElement("div", {}, "css:'col'+($index()+1) + (readOnly?' readonly':'')", undefined, "cell");
@@ -429,6 +542,11 @@ window.huy.control.dataGrid = (function () {
         function createColumnFilterCellDiv() {
             //css class ex:'col1 columnFilter'
             return window.huy.control.utilsDOM.createElement("div", {}, "css:'col'+($index()+1) + ' columnFilter'", undefined, "cell");
+        }
+
+        function createCustomFilterCellDiv() {
+            //css class ex:'customFilterCell'
+            return window.huy.control.utilsDOM.createElement("div", {}, "css:'col'+($index()+1) + ' customFilterCell'", undefined, undefined);
         }
     }
 

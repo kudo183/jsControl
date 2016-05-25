@@ -22,7 +22,14 @@
 	<div id="test"></div>
 	<button onclick="console.log(window.app.viewModel.testViewModel.toString());">Test</button>
 	<script>
-		var view = huy.control.dataGrid.createView("dataGrid");
+		var view = huy.control.dataGrid.createView("dataGrid",
+            {
+                hasCustomFilter: true,
+                hasColumnHeader: true,
+                hasColumnFilter: true,
+                hasBottomToolbar: true
+            }
+        );
 		$("#test").append(view);
 		ko.applyBindings(window.app.viewModel.testViewModel);
 	</script>
