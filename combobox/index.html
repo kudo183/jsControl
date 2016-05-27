@@ -2,72 +2,72 @@
 <html>
 
 <head>
-<meta charset="utf-8">
-<meta name=viewport content="width=device-width, initial-scale=1">
-<link href="huy.ko.binding.comboBox.css" rel="stylesheet">
-<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js'></script>	
-<script>
-</script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="huy.ko.binding.comboBox.css" rel="stylesheet">
+    <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js'></script>
+    <script>
+    </script>
 </head>
 
 <body>
-	
-	<button onclick="handleClick();">Test</button>
-	<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js'></script>
-	<script type='text/javascript' src='../huy.control.utilsDOM.js'></script>
-	<script type='text/javascript' src='huy.ko.binding.comboBox.js'></script>
-	<input id="inputvalue"/>
-	<button onclick="handleClick1();">Show Selected</button>
-	<div id="test"></div>
-	<div id="textKO" data-bind="cbSelectedValue: value, cbItems: items, cbItemText: 'text', cbItemValue: 'value'"></div>
-	<div id="performanceTest"></div>
-	<script>
-		var model = {
-			value: ko.observable(2),
-			items: ko.observableArray()
-		}
-		ko.utils.arrayPushAll(model.items, [{text:"gà",value:1},{text:"mèo",value:2}]);
-		
-		ko.applyBindings(model, $("#textKO")[0]);
-		function handleClick(){
-			//ko.utils.arrayPushAll(model.items, [{text:"heo",value:3},{text:"cá",value:4}]);
-			var v = $("#inputvalue").val();
-			
-			if(v.length > 0){
-				model.value(Number(v));
-			}else{
-				model.value(undefined);
-			}
-			console.log("selectedValue: " + ko.unwrap(model.value));
-		}
-		function handleClick1(){
-			//ko.utils.arrayPushAll(model.items, [{text:"heo",value:3},{text:"cá",value:4}]);
-			console.log("selectedValue: " + ko.unwrap(model.value));
-		}
-		function performanceTest(){
-			var model = [];
-			
-			var arrText = ["gà", "cáo", "voi", "cá", "cua", "vịt", "chó", "mèo", "bò", "tôm"];
-			for(var j=0; j< 50; j++){
-				$("#performanceTest").append(window.huy.control.utilsDOM.createElement("div", {id:"KO"+j}, "cbSelectedValue: value, cbItems: items, cbItemText: 'text', cbItemValue: 'value'"));
-				model.push({
-					value: ko.observable(),
-					items: ko.observableArray()
-				});
-				for(var i=0; i<1000; i++){
-					var t = arrText[Math.floor((Math.random() * 10))];
-					model[j].items.push({text:t+i,value:i});
-				}
-			}
-			
-			var start = new Date();
-			for(var j=0; j< 50; j++){
-				ko.applyBindings(model[j], $("#KO"+j)[0]);
-			}
-			var end = new Date();
-			alert(end-start);			
-		}
-	</script>
+
+    <button onclick="handleClick();">Test</button>
+    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js'></script>
+    <script type='text/javascript' src='../huy.control.utilsDOM.js'></script>
+    <script type='text/javascript' src='huy.ko.binding.comboBox.js'></script>
+    <input id="inputvalue" />
+    <button onclick="handleClick1();">Show Selected</button>
+    <div id="test"></div>
+    <div id="textKO" data-bind="cbSelectedValue: value, cbItems: items, cbItemText: 'text', cbItemValue: 'value'"></div>
+    <div id="performanceTest"></div>
+    <script>
+        var model = {
+            value: ko.observable(2),
+            items: ko.observableArray()
+        }
+        ko.utils.arrayPushAll(model.items, [{ text: "gà", value: 1 }, { text: "mèo", value: 2 }]);
+
+        ko.applyBindings(model, $("#textKO")[0]);
+        function handleClick() {
+            //ko.utils.arrayPushAll(model.items, [{text:"heo",value:3},{text:"cá",value:4}]);
+            var v = $("#inputvalue").val();
+
+            if (v.length > 0) {
+                model.value(Number(v));
+            } else {
+                model.value(undefined);
+            }
+            console.log("selectedValue: " + ko.unwrap(model.value));
+        }
+        function handleClick1() {
+            //ko.utils.arrayPushAll(model.items, [{text:"heo",value:3},{text:"cá",value:4}]);
+            console.log("selectedValue: " + ko.unwrap(model.value));
+        }
+        function performanceTest() {
+            var model = [];
+
+            var arrText = ["gà", "cáo", "voi", "cá", "cua", "vịt", "chó", "mèo", "bò", "tôm"];
+            for (var j = 0; j < 50; j++) {
+                $("#performanceTest").append(window.huy.control.utilsDOM.createElement("div", { id: "KO" + j }, "cbSelectedValue: value, cbItems: items, cbItemText: 'text', cbItemValue: 'value'"));
+                model.push({
+                    value: ko.observable(),
+                    items: ko.observableArray()
+                });
+                for (var i = 0; i < 1000; i++) {
+                    var t = arrText[Math.floor((Math.random() * 10))];
+                    model[j].items.push({ text: t + i, value: i });
+                }
+            }
+
+            var start = new Date();
+            for (var j = 0; j < 50; j++) {
+                ko.applyBindings(model[j], $("#KO" + j)[0]);
+            }
+            var end = new Date();
+            alert(end - start);
+        }
+    </script>
 </body>
 
 </html>
