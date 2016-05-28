@@ -37,37 +37,8 @@
         comboBox._ul = {};
         comboBox._selectedItemIndex = -1;
         comboBox._isInitialized = true;
-        comboBox._setItems = function (items) {
-            $(comboBox._input).val(undefined);
-            comboBox._items = items;
-            comboBox._filteredItems = items;
-            renderItems(comboBox._ul, items);
-        };
-        comboBox._setSelectedValue = function (value) {
-            var textValue = $(comboBox._input).val();
-            if (typeof value === "undefined" && typeof textValue !== "undefined") {
-                $(comboBox._input).val(undefined);
-                comboBox._filteredItems = comboBox._items;
-                renderItems(comboBox._ul, comboBox._filteredItems);
-                return;
-            }
-
-            var filteredItems = [];
-            for (var i = 0; i < comboBox._items.length; i++) {
-                var itemValue = getItemValue(comboBox._items[i]);
-                if (itemValue === value) {
-                    filteredItems.push(comboBox._items[i]);
-                }
-            }
-
-            if (filteredItems.length === 0) {
-                return;
-            } else {
-                $(comboBox._input).val(getItemText(filteredItems[0]));
-                comboBox._filteredItems = filteredItems;
-                renderItems(comboBox._ul, comboBox._filteredItems);
-            }
-        }
+        comboBox._setItems = fnSetItems;
+        comboBox._setSelectedValue = fnSetSelectedValue;
 
         $(comboBox).addClass("h-comboBox");
         var wrapper = window.huy.control.utilsDOM.createElement("div", {}, undefined, undefined, "h-wrapper");
@@ -88,7 +59,38 @@
 
         var hideListTimer;
 
-        comboBox._input.onkeydown = function (event) {
+        comboBox._input.onkeydown = fnInputKeyDown;
+
+        comboBox._input.oninput = fnOnInput;
+
+        comboBox._input.onblur = fnInputOnBlur;
+
+        comboBox._button.onclick = fnButtonOnClick;
+
+        function fnOnInput() {
+            console.log("enter handleInput: " + this.value);
+
+            filterItems(this.value);
+
+            if (comboBox._filteredItems.length === 0) {
+                $(this)[0].setCustomValidity("invalid");
+            } else {
+                $(this)[0].setCustomValidity("");
+            }
+
+            $(comboBox._listDiv).show();
+            console.log("exit handleInput: " + this.value);
+        }
+
+        function fnInputOnBlur() {
+            if ($(comboBox._listDiv).is(":visible") === true) {
+                hideListTimer = setTimeout(setValueAndHideList, 300)
+
+                console.log("isValid when lostFocus:" + $(this)[0].validity.valid);
+            }
+        }
+
+        function fnInputKeyDown(event) {
             switch (event.keyCode) {
                 case 27://Esc
                     hideList();
@@ -117,34 +119,44 @@
             console.log("onkeydown: " + event.keyCode);
         }
 
-        comboBox._input.oninput = function () {
-            console.log("enter handleInput: " + this.value);
-
-            filterItems(this.value);
-
-            if (comboBox._filteredItems.length === 0) {
-                $(this)[0].setCustomValidity("invalid");
-            } else {
-                $(this)[0].setCustomValidity("");
-            }
-
-            $(comboBox._listDiv).show();
-            console.log("exit handleInput: " + this.value);
-        }
-
-        comboBox._input.onblur = function () {
-            if ($(comboBox._listDiv).is(":visible") === true) {
-                hideListTimer = setTimeout(setValueAndHideList, 300)
-
-                console.log("isValid when lostFocus:" + $(this)[0].validity.valid);
-            }
-        }
-
-        comboBox._button.onclick = function () {
+        function fnButtonOnClick() {
             clearTimeout(hideListTimer);
             $(comboBox._listDiv).toggle();
             focusInputAndSelectAllText();
             console.log("toggleList");
+        }
+
+        function fnSetSelectedValue(value) {
+            var textValue = $(comboBox._input).val();
+            if (typeof value === "undefined" && typeof textValue !== "undefined") {
+                $(comboBox._input).val(undefined);
+                comboBox._filteredItems = comboBox._items;
+                renderItems(comboBox._ul, comboBox._filteredItems);
+                return;
+            }
+
+            var filteredItems = [];
+            for (var i = 0; i < comboBox._items.length; i++) {
+                var itemValue = getItemValue(comboBox._items[i]);
+                if (itemValue === value) {
+                    filteredItems.push(comboBox._items[i]);
+                }
+            }
+
+            if (filteredItems.length === 0) {
+                return;
+            } else {
+                $(comboBox._input).val(getItemText(filteredItems[0]));
+                comboBox._filteredItems = filteredItems;
+                renderItems(comboBox._ul, comboBox._filteredItems);
+            }
+        }
+
+        function fnSetItems(items) {
+            $(comboBox._input).val(undefined);
+            comboBox._items = items;
+            comboBox._filteredItems = items;
+            renderItems(comboBox._ul, items);
         }
 
         function setValueAndHideList() {
