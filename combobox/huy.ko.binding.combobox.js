@@ -225,6 +225,10 @@
                     window.huy.log("li onclick");
                     selectItem(this);
                 };
+                li.ontouchstart = function () {//for chrome tablet, chrome tablet onclick work incorrect
+                    window.huy.log("li ontouchstart");
+                    selectItem(this);
+                };
                 li.onmouseover = function () {
                     window.huy.log("li onmouseover");
                     highlightItem(this._index);
