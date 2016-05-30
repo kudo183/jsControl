@@ -1,4 +1,8 @@
 ﻿(function () {
+    window.huy.log = function (text) {
+        console.log(text);
+    };
+
     ko.bindingHandlers.cbSelectedValue = {
         after: ['cbItems'],
         update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
@@ -8,22 +12,22 @@
             }
             element._selectedValue = value;
             element._setSelectedValue(value);
-            console.log("cbSelectedValue update");
+            window.huy.log("cbSelectedValue update");
         }
     };
     ko.bindingHandlers.cbItems = {
         init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-            console.log("cbItems init");
+            window.huy.log("cbItems init");
             initComboBox(element, allBindings);
         },
         update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-            console.log("cbItems update");
+            window.huy.log("cbItems update");
             element._setItems(ko.unwrap(valueAccessor()));
         }
     };
 
     function initComboBox(element, allBindings) {
-        console.log("initComboBox");
+        window.huy.log("initComboBox");
 
         var comboBox = element;
         comboBox._listDiv = {};
@@ -64,7 +68,7 @@
         comboBox._button.onclick = fnButtonOnClick;
 
         function fnOnInput() {
-            console.log("enter handleInput: " + this.value);
+            window.huy.log("fnOnInput: " + this.value);
 
             filterItems(this.value);
 
@@ -75,14 +79,14 @@
             }
 
             $(comboBox._listDiv).show();
-            console.log("exit handleInput: " + this.value);
         }
 
         function fnInputOnBlur() {
+            window.huy.log("fnInputOnBlur");
             if ($(comboBox._listDiv).is(":visible") === true) {
                 hideListTimer = setTimeout(setValueAndHideList, 300)
 
-                console.log("isValid when lostFocus:" + $(this)[0].validity.valid);
+                window.huy.log("isValid when lostFocus:" + $(this)[0].validity.valid);
             }
         }
 
@@ -112,17 +116,18 @@
                     break;
             }
 
-            console.log("onkeydown: " + event.keyCode);
+            window.huy.log("onkeydown: " + event.keyCode);
         }
 
         function fnButtonOnClick() {
+            window.huy.log("fnButtonOnClick");
             clearTimeout(hideListTimer);
             $(comboBox._listDiv).toggle();
             focusInputAndSelectAllText();
-            console.log("toggleList");
         }
 
         function fnSetSelectedValue(value) {
+            window.huy.log("fnSetSelectedValue");
             var textValue = $(comboBox._input).val();
             if (typeof value === "undefined" && typeof textValue !== "undefined") {
                 $(comboBox._input).val(undefined);
@@ -149,13 +154,15 @@
         }
 
         function fnSetItems(items) {
+            window.huy.log("fnSetItems");
             $(comboBox._input).val(undefined);
             comboBox._items = items;
-            
+
             element._setSelectedValue(element._selectedValue);
         }
 
         function setValueAndHideList() {
+            window.huy.log("setValueAndHideList");
             var item = comboBox._filteredItems[comboBox._selectedItemIndex];
             var text = getItemText(item);
             $(comboBox._input).val(text);
@@ -164,11 +171,12 @@
             var cbSelectedValue = allBindings.get("cbSelectedValue");
             element._selectedValue = getItemValue(item);
             cbSelectedValue(element._selectedValue);
-            
+
             hideList();
         }
 
         function highlightItem(index) {
+            window.huy.log("highlightItem");
             if (comboBox._selectedItemIndex === index) {
                 return;
             }
@@ -178,9 +186,9 @@
         }
 
         function hideList() {
+            window.huy.log("hideList");
             clearTimeout(hideListTimer);
             $(comboBox._listDiv).hide();
-            console.log("hide");
         }
 
         function focusInputAndSelectAllText() {
@@ -189,13 +197,14 @@
         }
 
         function selectItem(li) {
+            window.huy.log("selectItem:" + li.innerText);
             highlightItem(li._index);
             setValueAndHideList();
             focusInputAndSelectAllText();
-            console.log("selectItem:" + li.innerText);
         }
 
         function filterItems(value) {
+            window.huy.log("filterItems");
             comboBox._filteredItems = [];
             for (var i = 0; i < comboBox._items.length; i++) {
                 if (getItemText(comboBox._items[i]).search(new RegExp(value.replace("\\", "\\\\"), "i")) == 0) {
@@ -206,15 +215,18 @@
         }
 
         function renderItems(ul, items) {
+            window.huy.log("renderItems");
             $(comboBox._ul).empty();
 
             for (var i = 0; i < items.length; i++) {
                 var li = window.huy.control.utilsDOM.createElement("li", {}, undefined, getItemText(items[i]));
                 li._index = i;
                 li.onclick = function () {
+                    window.huy.log("li onclick");
                     selectItem(this);
                 };
                 li.onmouseover = function () {
+                    window.huy.log("li onmouseover");
                     highlightItem(this._index);
                 };
                 ul.appendChild(li);
