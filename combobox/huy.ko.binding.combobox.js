@@ -1,9 +1,6 @@
 ﻿(function () {
     ko.bindingHandlers.cbSelectedValue = {
-        init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-            console.log("cbSelectedValue init: " + element.id);
-            initComboBox(element, allBindings);
-        },
+        after: ['cbItems'],
         update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
             element._setSelectedValue(ko.unwrap(valueAccessor()));
             console.log("cbSelectedValue update");
@@ -22,13 +19,8 @@
     };
 
     function initComboBox(element, allBindings) {
-        if (element._isInitialized === true) {
-            return;
-        }
-
         console.log("initComboBox");
 
-        element._isInitialized = true;
         var comboBox = element;
         comboBox._listDiv = {};
         comboBox._input = {};
@@ -36,7 +28,6 @@
         comboBox._filteredItems = [];
         comboBox._ul = {};
         comboBox._selectedItemIndex = -1;
-        comboBox._isInitialized = true;
         comboBox._setItems = fnSetItems;
         comboBox._setSelectedValue = fnSetSelectedValue;
 
