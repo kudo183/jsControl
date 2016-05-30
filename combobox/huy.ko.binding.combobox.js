@@ -2,7 +2,12 @@
     ko.bindingHandlers.cbSelectedValue = {
         after: ['cbItems'],
         update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-            element._setSelectedValue(ko.unwrap(valueAccessor()));
+            var value = ko.unwrap(valueAccessor());
+            if (element._selectedValue === value) {
+                return;
+            }
+            element._selectedValue = value;
+            element._setSelectedValue(value);
             console.log("cbSelectedValue update");
         }
     };
@@ -14,7 +19,6 @@
         update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
             console.log("cbItems update");
             element._setItems(ko.unwrap(valueAccessor()));
-            element._setSelectedValue(ko.unwrap(allBindings.get("cbSelectedValue")));
         }
     };
 
@@ -28,6 +32,7 @@
         comboBox._filteredItems = [];
         comboBox._ul = {};
         comboBox._selectedItemIndex = -1;
+        comboBox._selectedValue = undefined;
         comboBox._setItems = fnSetItems;
         comboBox._setSelectedValue = fnSetSelectedValue;
 
@@ -146,23 +151,21 @@
         function fnSetItems(items) {
             $(comboBox._input).val(undefined);
             comboBox._items = items;
-            comboBox._filteredItems = items;
-            renderItems(comboBox._ul, items);
+            
+            element._setSelectedValue(element._selectedValue);
         }
 
         function setValueAndHideList() {
-            setValueFromSelectedItem();
-            hideList();
-        }
-
-        function setValueFromSelectedItem() {
             var item = comboBox._filteredItems[comboBox._selectedItemIndex];
             var text = getItemText(item);
             $(comboBox._input).val(text);
             filterItems(text);
 
             var cbSelectedValue = allBindings.get("cbSelectedValue");
-            cbSelectedValue(getItemValue(item));
+            element._selectedValue = getItemValue(item);
+            cbSelectedValue(element._selectedValue);
+            
+            hideList();
         }
 
         function highlightItem(index) {
