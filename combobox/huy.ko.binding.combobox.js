@@ -58,6 +58,7 @@
         comboBox.appendChild(comboBox._listDiv);
 
         var hideListTimer;
+        var selectItemTimer;
 
         comboBox._input.onkeydown = fnInputKeyDown;
 
@@ -71,20 +72,19 @@
             window.huy.log("fnOnInput: " + this.value);
 
             filterItems(this.value);
+            renderItems(comboBox._ul, comboBox._filteredItems);
 
             if (comboBox._filteredItems.length === 0) {
                 $(this)[0].setCustomValidity("invalid");
             } else {
                 $(this)[0].setCustomValidity("");
             }
-
-            $(comboBox._listDiv).show();
         }
 
         function fnInputOnBlur() {
             window.huy.log("fnInputOnBlur");
             if ($(comboBox._listDiv).is(":visible") === true) {
-                hideListTimer = setTimeout(setValueAndHideList, 300)
+                hideListTimer = setTimeout(setValueAndHideList, 300);
 
                 window.huy.log("isValid when lostFocus:" + $(this)[0].validity.valid);
             }
@@ -108,9 +108,7 @@
                     }
                     break;
                 case 40://Down
-                    if ($(comboBox._listDiv).is(":visible") === false) {
-                        $(comboBox._listDiv).show();
-                    } else if (comboBox._selectedItemIndex < comboBox._filteredItems.length - 1) {
+                    if (comboBox._selectedItemIndex < comboBox._filteredItems.length - 1) {
                         highlightItem(comboBox._selectedItemIndex + 1);
                     }
                     break;
@@ -122,7 +120,12 @@
         function fnButtonOnClick() {
             window.huy.log("fnButtonOnClick");
             clearTimeout(hideListTimer);
-            $(comboBox._listDiv).toggle();
+
+            if ($(comboBox._listDiv).is(":visible")) {
+                hideList();
+            } else {
+                renderItems(comboBox._ul, comboBox._filteredItems);
+            }
             focusInputAndSelectAllText();
         }
 
@@ -132,7 +135,6 @@
             if (typeof value === "undefined" && typeof textValue !== "undefined") {
                 $(comboBox._input).val(undefined);
                 comboBox._filteredItems = comboBox._items;
-                renderItems(comboBox._ul, comboBox._filteredItems);
                 return;
             }
 
@@ -149,7 +151,6 @@
             } else {
                 $(comboBox._input).val(getItemText(filteredItems[0]));
                 comboBox._filteredItems = filteredItems;
-                renderItems(comboBox._ul, comboBox._filteredItems);
             }
         }
 
@@ -189,6 +190,7 @@
             window.huy.log("hideList");
             clearTimeout(hideListTimer);
             $(comboBox._listDiv).hide();
+            $(comboBox._ul).empty();
         }
 
         function focusInputAndSelectAllText() {
@@ -211,7 +213,6 @@
                     comboBox._filteredItems.push(comboBox._items[i]);
                 }
             }
-            renderItems(comboBox._ul, comboBox._filteredItems);
         }
 
         function renderItems(ul, items) {
@@ -227,8 +228,13 @@
                 };
                 li.ontouchstart = function () {//for chrome tablet, chrome tablet onclick work incorrect
                     window.huy.log("li ontouchstart");
-                    selectItem(this);
+                    selectItemTimer = setTimeout(selectItem.bind(null, this), 300);
                 };
+                li.ontouchmove = function () {
+                    window.huy.log("li ontouchmove");
+                    clearTimeout(selectItemTimer);
+                };
+
                 li.onmouseover = function () {
                     window.huy.log("li onmouseover");
                     highlightItem(this._index);
@@ -238,6 +244,8 @@
 
             comboBox._selectedItemIndex = 0;
             $(comboBox._ul).children().eq(0).addClass("h-boundlist-selected");
+
+            $(comboBox._listDiv).show();
         }
 
         function getItemText(item) {
