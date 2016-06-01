@@ -12,24 +12,28 @@
 
 <body>
 
-    <button onclick="handleClick();">Test</button>
+    <button onclick="btnChangeSelectedValue();">Change Selected Value</button>
     <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js'></script>
     <script type='text/javascript' src='../huy.control.utilsDOM.js'></script>
     <script type='text/javascript' src='huy.ko.binding.comboBox.js'></script>
     <input id="inputvalue" />
     <button onclick="handleClick1();">Show Selected</button>
-    <div id="test"></div>
-    <div id="textKO" data-bind="cbSelectedValue: value, cbItems: items, cbItemText: 'text', cbItemValue: 'value'"></div>
+    <button onclick="btnChangeItems();">Change Items</button>
+
+    <div id="textKO">
+        selected value: <span data-bind="text: value"></span>
+        <div data-bind="cbSelectedValue: value, cbItems: items, cbItemText: 'text', cbItemValue: 'value'"></div>
+    </div>
     <div id="performanceTest"></div>
     <script>
         var model = {
             value: ko.observable(2),
             items: ko.observableArray()
         }
-        ko.utils.arrayPushAll(model.items, [{ text: "gà", value: 1 }, { text: "mèo", value: 2 }]);
+        ko.utils.arrayPushAll(model.items, [{ text: "gà1", value: 1 }, { text: "mèo2", value: 2 }, { text: "ghó3", value: 3 }]);
 
         ko.applyBindings(model, $("#textKO")[0]);
-        function handleClick() {
+        function btnChangeSelectedValue() {
             //ko.utils.arrayPushAll(model.items, [{text:"heo",value:3},{text:"cá",value:4}]);
             var v = $("#inputvalue").val();
 
@@ -43,6 +47,9 @@
         function handleClick1() {
             //ko.utils.arrayPushAll(model.items, [{text:"heo",value:3},{text:"cá",value:4}]);
             console.log("selectedValue: " + ko.unwrap(model.value));
+        }
+        function btnChangeItems() {
+            model.items([{ text: "heo11", value: 11 }, { text: "cá2", value: 2 }]);
         }
         function performanceTest() {
             var model = [];

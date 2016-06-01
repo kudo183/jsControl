@@ -200,12 +200,15 @@
 
         function highlightItem(index) {
             window.huy.log("highlightItem");
-            if (comboBox._selectedItemIndex === index) {
-                return;
-            }
+
             $(comboBox._ul).children().eq(comboBox._selectedItemIndex).removeClass("h-boundlist-selected");
+
+            var elem = $(comboBox._ul).children().eq(index);
+            elem.addClass("h-boundlist-selected");
+
+            window.huy.control.utilsDOM.scrollToViewElement(comboBox._listDiv, elem);
+            
             comboBox._selectedItemIndex = index;
-            $(comboBox._ul).children().eq(comboBox._selectedItemIndex).addClass("h-boundlist-selected");
         }
 
         function hideList() {
@@ -264,10 +267,9 @@
                 ul.appendChild(li);
             }
 
-            comboBox._selectedItemIndex = 0;
-            $(comboBox._ul).children().eq(0).addClass("h-boundlist-selected");
-
             $(comboBox._listDiv).show();
+            
+            highlightItem(0);
         }
 
         function setInputText(text) {
