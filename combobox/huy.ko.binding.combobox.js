@@ -84,7 +84,7 @@
         function fnInputOnBlur() {
             window.huy.log("fnInputOnBlur");
             if ($(comboBox._listDiv).is(":visible") === true) {
-                hideListTimer = setTimeout(setValueAndHideList, 300);
+                hideListTimer = setTimeout(cancelChangeAndHideList, 300);
 
                 window.huy.log("isValid when lostFocus:" + $(this)[0].validity.valid);
             }
@@ -93,14 +93,20 @@
         function fnInputKeyDown(event) {
             switch (event.keyCode) {
                 case 27://Esc
-                    hideList();
+                    //use timer instead of direct call
+                    //because if direct call, firefox will raise oninput event after this event because input text changed.
+                    setTimeout(cancelChangeAndHideList, 100);
                     break;
                 case 9://Tab
-                    setValueAndHideList();
+                    if ($(comboBox._listDiv).is(":visible") === true) {
+                        setValueAndHideList();
+                    }
                     break;
                 case 13://Enter
-                    setValueAndHideList();
-                    $(comboBox._input).select();
+                    if ($(comboBox._listDiv).is(":visible") === true) {
+                        setValueAndHideList();
+                        $(comboBox._input).select();
+                    }
                     break;
                 case 38://Up
                     if ($(comboBox._listDiv).is(":visible") && comboBox._selectedItemIndex > 0) {
@@ -122,7 +128,7 @@
             clearTimeout(hideListTimer);
 
             if ($(comboBox._listDiv).is(":visible")) {
-                hideList();
+                cancelChangeAndHideList();
             } else {
                 renderItems(comboBox._ul, comboBox._filteredItems);
             }
@@ -133,7 +139,7 @@
             window.huy.log("fnSetSelectedValue");
             var textValue = $(comboBox._input).val();
             if (typeof value === "undefined" && typeof textValue !== "undefined") {
-                $(comboBox._input).val(undefined);
+                setInputText(undefined);
                 comboBox._filteredItems = comboBox._items;
                 return;
             }
@@ -149,24 +155,40 @@
             if (filteredItems.length === 0) {
                 return;
             } else {
-                $(comboBox._input).val(getItemText(filteredItems[0]));
+                setInputText(getItemText(filteredItems[0]));
                 comboBox._filteredItems = filteredItems;
             }
         }
 
         function fnSetItems(items) {
             window.huy.log("fnSetItems");
-            $(comboBox._input).val(undefined);
+            setInputText(undefined);
             comboBox._items = items;
 
             element._setSelectedValue(element._selectedValue);
+        }
+
+        function cancelChangeAndHideList() {
+            window.huy.log("cancelChangeAndHideList");
+
+            comboBox._filteredItems = [];
+            for (var i = 0; i < comboBox._items.length; i++) {
+                var itemValue = getItemValue(comboBox._items[i]);
+                if (itemValue === comboBox._selectedValue) {
+                    comboBox._filteredItems.push(comboBox._items[i]);
+                }
+            }
+
+            setInputText(getItemText(comboBox._filteredItems[0]));
+
+            hideList();
         }
 
         function setValueAndHideList() {
             window.huy.log("setValueAndHideList");
             var item = comboBox._filteredItems[comboBox._selectedItemIndex];
             var text = getItemText(item);
-            $(comboBox._input).val(text);
+            setInputText(text);
             filterItems(text);
 
             var cbSelectedValue = allBindings.get("cbSelectedValue");
@@ -246,6 +268,11 @@
             $(comboBox._ul).children().eq(0).addClass("h-boundlist-selected");
 
             $(comboBox._listDiv).show();
+        }
+
+        function setInputText(text) {
+            window.huy.log("setInputText: " + text);
+            $(comboBox._input).val(text);
         }
 
         function getItemText(item) {
