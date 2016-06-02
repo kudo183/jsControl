@@ -20,10 +20,15 @@ window.huy.control.dataGrid = (function () {
             currentSelectedItem: ko.observable(),
             previousSelectedItem: {},
             _rowClicked: function (root, index, item) {
+                item.isSelected(true);
+
+                if (root.currentSelectedItem() !== undefined) {
+                    root.currentSelectedItem().isSelected(false);
+                }
+
                 root.previousSelectedItem = ko.unwrap(root.currentSelectedItem);
                 root.currentSelectedItem(item);
-                console.log(JSON.stringify(ko.toJS(item)));
-                console.log(index);
+                console.log(index + JSON.stringify(ko.toJS(item)));
                 return true;
             },
             addCustomFilters: addCustomFilters,
@@ -41,6 +46,7 @@ window.huy.control.dataGrid = (function () {
                             item[root._columns[i].cellValueProperty] = ko.observable();
                             console.log(root._columns[i].cellValueProperty);
                         }
+                        item.isSelected = ko.observable(false);
                         root.items.push(item);
                         root.itemsAdded.push(item);
                     }
@@ -128,9 +134,9 @@ window.huy.control.dataGrid = (function () {
             filter.pageIndex = root.paging.currentPageIndex();
 
             root._dataProvider.getItemsAjax(filter, function (result) {
-                root.items(result.items);
                 for (var i = 0; i < result.items.length; i++) {
                     var item = result.items[i];
+                    item.isSelected = ko.observable(false);
                     for (var j = 0; j < root._columns.length; j++) {
                         if (root._columns[j].readOnly === false) {
                             addChangeTracking(item, root._columns[j].cellValueProperty);
@@ -142,6 +148,7 @@ window.huy.control.dataGrid = (function () {
                     root.comboBoxItemsSource[d](result.comboBoxItemsSource[d]);
                 }
 
+                root.items(result.items);
                 root._isSkipLoadFunction = true;
                 root.paging.pageCount(result.pageCount);
                 root.paging.currentPageIndex(result.pageIndex);
@@ -445,10 +452,10 @@ window.huy.control.dataGrid = (function () {
             var row, cell;
             if (style === "row") {
                 row = window.huy.control.utilsDOM.createElement(
-                "div", {}, "click: function(data, event){return $parents[0]._rowClicked($parents[0], $index(), data, event)}, foreach: $parent._columns, css: css", undefined, "row");
+                "div", {}, "click: function(data, event){return $parents[0]._rowClicked($parents[0], $index(), data, event)}, foreach: $parent._columns, css: css() + ' ' + (isSelected()?' selected':'')", undefined, "row");
             } else {
                 row = window.huy.control.utilsDOM.createElement(
-                "div", {}, "click: function(data, event){return $parents[0]._rowClicked($parents[0], $index(), data, event)}, foreach: $parent._columns", undefined, "row");
+                "div", {}, "click: function(data, event){return $parents[0]._rowClicked($parents[0], $index(), data, event)}, foreach: $parent._columns, css: (isSelected()?' selected':'')", undefined, "row");
             }
 
             //readonly text
