@@ -325,7 +325,7 @@ window.huy.control.dataGrid = (function () {
 
             //comboBox
             cell = createCustomFilterCellDiv();
-            addColumnFilterCell(row, cell, "cbSelectedValue: filterValue, cbItems: $root.comboBoxItemsSource[itemsSourceName], cbItemText: itemText, cbItemValue: itemValue"
+            addColumnFilterCell(row, cell, "cbSelectedValue: filterValue, cbItems: $parents[0].comboBoxItemsSource[itemsSourceName], cbItemText: itemText, cbItemValue: itemValue"
             , 'comboBox', "div", {});
 
             //date
@@ -334,7 +334,7 @@ window.huy.control.dataGrid = (function () {
 
             //action
             cell = createCustomFilterCellDiv();
-            addCell(row, cell, "text:text, click: function(data, event) { action($root, 'filter', data, event) }"
+            addCell(row, cell, "text:text, click: function(data, event) { action($parents[0], 'filter', data, event) }"
             , 'action', "button", {});
 
             //template
@@ -378,7 +378,7 @@ window.huy.control.dataGrid = (function () {
 
             //comboBox
             cell = createColumnFilterCellDiv();
-            addColumnFilterCell(row, cell, "cbSelectedValue: filterValue, cbItems: $root.comboBoxItemsSource[itemsSourceName], cbItemText: itemText, cbItemValue: itemValue"
+            addColumnFilterCell(row, cell, "cbSelectedValue: filterValue, cbItems: $parents[0].comboBoxItemsSource[itemsSourceName], cbItemText: itemText, cbItemValue: itemValue"
             , 'comboBox', "div", {});
 
             //date
@@ -387,7 +387,7 @@ window.huy.control.dataGrid = (function () {
 
             //action
             cell = createColumnFilterCellDiv();
-            addCell(row, cell, "text:text, click: function(data, event) { action($root, 'filter', data, event) }"
+            addCell(row, cell, "text:text, click: function(data, event) { action($parents[0], 'filter', data, event) }"
             , 'action', "button", {});
 
             //template
@@ -415,15 +415,15 @@ window.huy.control.dataGrid = (function () {
             var view = window.huy.control.utilsDOM.createElement("div", {}, undefined, undefined, "gridBottomToolbar");
             var koWithPaging = window.huy.control.utilsDOM.createComment("ko with: paging");
             var isEnable = window.huy.control.utilsDOM.createElement("input", { type: "checkbox" }, "checked: $parent.enablePaging", undefined, undefined);
-            var first = window.huy.control.utilsDOM.createElement("button", {}, "enable: $parent.enablePaging, click: function(data, event){first($root, data, event)}", "|<", undefined);
-            var last = window.huy.control.utilsDOM.createElement("button", {}, "enable: $parent.enablePaging, click: function(data, event){last($root, data, event)}", ">|", undefined);
+            var first = window.huy.control.utilsDOM.createElement("button", {}, "enable: $parent.enablePaging, click: function(data, event){first($parents[0], data, event)}", "|<", undefined);
+            var last = window.huy.control.utilsDOM.createElement("button", {}, "enable: $parent.enablePaging, click: function(data, event){last($parents[0], data, event)}", ">|", undefined);
             var pageIndex = window.huy.control.utilsDOM.createElement("input", { size: 2 }, "enable: $parent.enablePaging, value: currentPageIndex", undefined, undefined);
             var pageCount = window.huy.control.utilsDOM.createElement("span", {}, "text:'/'+pageCount()", undefined, undefined);
-            var prev = window.huy.control.utilsDOM.createElement("button", {}, "enable: $parent.enablePaging, click: function(data, event){prev($root, data, event)}", "<", undefined);
-            var next = window.huy.control.utilsDOM.createElement("button", {}, "enable: $parent.enablePaging, click: function(data, event){next($root, data, event)}", ">", undefined);
+            var prev = window.huy.control.utilsDOM.createElement("button", {}, "enable: $parent.enablePaging, click: function(data, event){prev($parents[0], data, event)}", "<", undefined);
+            var next = window.huy.control.utilsDOM.createElement("button", {}, "enable: $parent.enablePaging, click: function(data, event){next($parents[0], data, event)}", ">", undefined);
             var endKoWithPaging = window.huy.control.utilsDOM.createComment("/ko");
             var koButtons = window.huy.control.utilsDOM.createComment("ko foreach:buttons");
-            var button = window.huy.control.utilsDOM.createElement("button", {}, "text:text, click: function(data, event){action($root, data, event)}");
+            var button = window.huy.control.utilsDOM.createElement("button", {}, "text:text, click: function(data, event){action($parents[0], data, event)}");
             var endKoButtons = window.huy.control.utilsDOM.createComment("/ko");
 
             view.appendChild(koWithPaging);
@@ -445,10 +445,10 @@ window.huy.control.dataGrid = (function () {
             var row, cell;
             if (style === "row") {
                 row = window.huy.control.utilsDOM.createElement(
-                "div", {}, "click: function(data, event){return $root._rowClicked($root, $index(), data, event)}, foreach: $parent._columns, css: css", undefined, "row");
+                "div", {}, "click: function(data, event){return $parents[0]._rowClicked($parents[0], $index(), data, event)}, foreach: $parent._columns, css: css", undefined, "row");
             } else {
                 row = window.huy.control.utilsDOM.createElement(
-                "div", {}, "click: function(data, event){return $root._rowClicked($root, $index(), data, event)}, foreach: $parent._columns", undefined, "row");
+                "div", {}, "click: function(data, event){return $parents[0]._rowClicked($parents[0], $index(), data, event)}, foreach: $parent._columns", undefined, "row");
             }
 
             //readonly text
@@ -465,7 +465,7 @@ window.huy.control.dataGrid = (function () {
 
             //comboBox
             cell = createCellDiv();
-            addCell(row, cell, "cbSelectedValue: $parent[cellValueProperty], cbItems: $root.comboBoxItemsSource[itemsSourceName], cbItemText: itemText, cbItemValue: itemValue"
+            addCell(row, cell, "cbSelectedValue: $parent[cellValueProperty], cbItems: $parents[1].comboBoxItemsSource[itemsSourceName], cbItemText: itemText, cbItemValue: itemValue"
             , 'comboBox', "div", {});
 
             //date
@@ -474,7 +474,7 @@ window.huy.control.dataGrid = (function () {
 
             //action
             cell = createCellDiv();
-            addCell(row, cell, "text:text, click: function(data, event) { action($root, $parent, data, event) }"
+            addCell(row, cell, "text:text, click: function(data, event) { action($parents[1], $parent, data, event) }"
             , 'action', "button", {});
 
             //template
