@@ -43,8 +43,12 @@ window.huy.control.dataGrid = (function () {
                     action: function (root) {
                         var item = {};
                         for (var i = 1; i < root._columns.length; i++) {
-                            item[root._columns[i].cellValueProperty] = ko.observable();
-                            console.log(root._columns[i].cellValueProperty);
+                            var v = ko.unwrap(root._columns[i].filterValue);
+                            if (v === undefined) {
+                                v = root._columns[i].defaultValue;
+                            }
+                            item[root._columns[i].cellValueProperty] = ko.observable(v);
+                            console.log(root._columns[i].cellValueProperty + " default value: " + v);
                         }
                         item.isSelected = ko.observable(false);
                         root.items.push(item);

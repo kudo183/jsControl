@@ -16,7 +16,8 @@ window.app.viewModel.testViewModel = (function () {
         cellValueProperty: "column2",
         readOnly: false,
         order: 0,
-        filterValue: ko.observable()
+        filterValue: ko.observable(),
+        defaultValue: "text"
     });
     viewModel.addColumn({
         headerText: "Col3",
@@ -24,7 +25,8 @@ window.app.viewModel.testViewModel = (function () {
         cellValueProperty: "column3",
         readOnly: false,
         order: 0,
-        filterValue: ko.observable()
+        filterValue: ko.observable(),
+        defaultValue: true
     });
     
     viewModel.addColumn({
