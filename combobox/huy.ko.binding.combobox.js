@@ -130,6 +130,8 @@
             if ($(comboBox._listDiv).is(":visible")) {
                 cancelChangeAndHideList();
             } else {
+                setInputText(undefined);
+                comboBox._filteredItems = comboBox._items;
                 renderItems(comboBox._ul, comboBox._filteredItems);
             }
             focusInputAndSelectAllText();
@@ -280,6 +282,9 @@
         function getItemText(item) {
             if (allBindings.has("cbItemText")) {
                 var t = allBindings.get("cbItemText");
+                if(item === undefined){
+                    return undefined;
+                }
                 var u = ko.unwrap(item);
                 return u[t];
             } else {
@@ -291,6 +296,9 @@
         function getItemValue(item) {
             if (allBindings.has("cbItemValue")) {
                 var t = allBindings.get("cbItemValue");
+                if(item === undefined){
+                    return undefined;
+                }
                 var u = ko.unwrap(item);
                 return u[t];
             } else {
