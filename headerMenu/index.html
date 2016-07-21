@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="huy.control.headerMenu.css" rel="stylesheet">
+    <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js'></script>
+    <script>
+    </script>
+</head>
+
+<body>
+    <div id="headerMenu"/>
+    
+    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js'></script>
+    <script type='text/javascript' src='../huy.control.utilsDOM.js'></script>
+    <script type='text/javascript' src='huy.control.headerMenu.js'></script>
+    <script>
+        var headerMenuViewModel = {
+            items: [
+                { text: "Item 1", value: "item1", id: "" },
+                { text: "Item 2", value: "item2", id: "" },
+                { text: "Item 3", value: "item3", id: "" }
+            ],
+            selectedItemText: ko.observable("Item 2"),
+            selectedItemValue: ko.observable("item2"),
+            buttons: [
+                {
+                    text: "",
+                    id: "refreshButton",
+                    action: function () {
+                        alert("refresh button clicked");
+                    }
+                },
+                {
+                    text: "A",
+                    id: "aButton",
+                    action: function () {
+                        alert("A button clicked");
+                    }
+                }
+            ]
+        };
+        $("#headerMenu").append(window.huy.control.headerMenu.createView("headerMenuView", headerMenuViewModel));
+    </script>
+</body>
+
+</html>
