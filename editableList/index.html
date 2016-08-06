@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta charset="utf-8" />
+    <title>Debug</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.css" />
+    <link rel="stylesheet" type="text/css" href="../combobox/huy.ko.binding.combobox.css" />
+    <link rel="stylesheet" type="text/css" href="huypq.control.editableList.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-debug.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.js"></script>
+</head>
+
+<body>    
+    <script src="../huy.control.utilsDOM.js"></script>
+    <script src="../combobox/huy.ko.binding.combobox.js"></script>
+    <script src="huypq.control.editableList.js"></script>
+    <script src="fakeDataProvider.js"></script>
+    <script>
+        var viewModel = window.huypq.control.editableList.createViewModel(window.app.fakeDataProvider);        
+        
+        viewModel.setPropertiesList([
+        {
+            name: "soTien",
+            type: "number",
+            defaultValue: undefined,
+            title: "So tien:"
+        },
+        {
+            name: ["maMucChi", "tenMucChi", "mucChis", "ma", "tenMucChi"],
+            type: "keyValue",
+            defaultValue: undefined,
+            title: "Muc chi:"
+        },
+        {
+            name: "ghiChu",
+            type: "text",
+            defaultValue: undefined,
+            title: "Ghi chu:"
+        },
+        {
+            name: ["maTaiKhoan", "tenTaiKhoan", "taiKhoans", "ma", "tenTaiKhoan"],
+            type: "keyValue",
+            defaultValue: 1,
+            title: "Tai khoan:"
+        }]);
+        
+        var listTemplate =
+          '<div>'
+            + '<span data-bind="text: tenMucChi"></span>'
+            + '<span class="rightAlign" data-bind="text: soTien"></span>'
+        + '</div>'
+        + '<div class="clear borderBottom">'
+            + '<span data-bind="text: ghiChu"></span>'
+            + '<span class="rightAlign" data-bind="text: tenTaiKhoan"></span>'
+        + '</div>';
+        
+        viewModel.load(viewModel);
+        var view = window.huypq.control.editableList.createView(viewModel, listTemplate);
+        $(document.body).append(view);
+        ko.applyBindings(viewModel);
+    </script>
+</body>
+</html>
