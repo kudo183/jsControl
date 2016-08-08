@@ -6,8 +6,8 @@ window.huypq.control.editableList = (function () {
         createViewModel: createViewModel
     };
     return editableList;
-    
-    function createView(viewModel, listTemplate){
+
+    function createView(viewModel, listTemplate) {
         var view = $('<div class="editableList"></div>');
         var topBar = $('<div><input type="text" placeholder="search text" onClick="this.setSelectionRange(0, this.value.length)" data-bind="value: searchText"></div>');
         var btnToggleEditBlock = $('<button data-bind="html: toggleButtonText"></button>');
@@ -16,10 +16,10 @@ window.huypq.control.editableList = (function () {
         var editBlock = $('<div class="editBlock" data-bind="with: activeItem"></div>');
         $(editBlock).hide();
         view.append(editBlock);
-        for(var i=0;i<viewModel.propertiesList.length;i++){
+        for (var i = 0; i < viewModel.propertiesList.length; i++) {
             var p = viewModel.propertiesList[i];
             editBlock.append('<div>' + p.title + '</div>');
-            if(p.type === "keyValue"){
+            if (p.type === "keyValue") {
                 var combobox = '<div data-bind="cbSelectedValue: '
                 + p.name[0]
                 + ', cbItems: $parent.'
@@ -28,20 +28,25 @@ window.huypq.control.editableList = (function () {
                 + ", cbItemText: '" + p.name[4] + "'"
                 + '"></div>';
                 editBlock.append(combobox);
-            }else if(p.type === "text"){
+            } else if (p.type === "text") {
                 var text = '<div><input type="text" onClick="this.setSelectionRange(0, this.value.length)" data-bind="textInput: '
                 + p.name
                 + '"></div>';
                 editBlock.append(text);
-            }else if(p.type === "number"){
+            } else if (p.type === "number") {
                 var number = '<div><input type="number" onClick="this.setSelectionRange(0, this.value.length)" data-bind="textInput: '
+                + p.name
+                + '"></div>';
+                editBlock.append(number);
+            } else if (p.type === "date") {
+                var number = '<div><input data-bind="datepicker: '
                 + p.name
                 + '"></div>';
                 editBlock.append(number);
             }
         }
         editBlock.append("<br />");
-        
+
         var buttons = $('<div class="rightAlign"></div>');
         editBlock.append(buttons);
         editBlock.append('<div class="clear"></div>');
@@ -51,61 +56,61 @@ window.huypq.control.editableList = (function () {
         buttons.append(btnAdd);
         buttons.append(btnSave);
         buttons.append(btnDelete);
-        
+
         $(btnAdd).click(function () {
             viewModel.add(viewModel);
             view.hideEditBlock(viewModel);
         });
-        
+
         $(btnSave).click(function () {
             viewModel.update(viewModel);
             view.hideEditBlock(viewModel);
         });
-        
+
         $(btnDelete).click(function () {
             viewModel.remove(viewModel);
             view.hideEditBlock(viewModel);
         });
-        
+
         $(btnToggleEditBlock).click(function () {
-            if(viewModel.toggleButtonText() === "&#x2228"){
+            if (viewModel.toggleButtonText() === "&#x2228") {
                 $(viewModel.btnSave).hide();
                 $(viewModel.btnDelete).hide();
                 viewModel.activeItem.fromDefaultValue(viewModel);
                 $(editBlock).show(100);
                 viewModel.toggleButtonText("&#x2227");
-            }else{
+            } else {
                 view.hideEditBlock(viewModel);
-            }            
+            }
         });
-        
+
         var itemList = $('<div class="itemList" data-bind="foreach: items"></div>');
         var itemWrapper = $('<div data-bind="click: $root.itemClicked.bind($data, $root)"></div>');
-        
+
         view.append(itemList);
         itemList.append(itemWrapper);
         itemWrapper.append(listTemplate);
-        
+
         viewModel.editBlock = editBlock;
         viewModel.btnAdd = btnAdd;
         viewModel.btnSave = btnSave;
         viewModel.btnDelete = btnDelete;
-        
-        view.hideEditBlock = function(viewModel){            
+
+        view.hideEditBlock = function (viewModel) {
             $(viewModel.editBlock).hide(100);
             viewModel.toggleButtonText("&#x2228");
         };
         return view;
     }
-    
-    function createViewModel(dataProvider){
+
+    function createViewModel(dataProvider) {
         var viewModel = {
             searchText: "",
             toggleButtonText: ko.observable("&#x2228"),
-            activeItem:{},
-            items:ko.observableArray(),
-            propertiesList:[],
-            itemClicked: function(viewModel){
+            activeItem: {},
+            items: ko.observableArray(),
+            propertiesList: [],
+            itemClicked: function (viewModel) {
                 $(viewModel.btnSave).show();
                 $(viewModel.btnDelete).show();
                 viewModel.activeItem.fromItem(viewModel, this);
@@ -115,103 +120,103 @@ window.huypq.control.editableList = (function () {
             editBlock: {},
             dataProvider: dataProvider
         };
-        
+
         viewModel.activeItem.toItem = function (viewModel) {
             var result = {};
-            for(var i=0; i<viewModel.propertiesList.length; i++){
+            for (var i = 0; i < viewModel.propertiesList.length; i++) {
                 var property = viewModel.propertiesList[i];
-                if(property.type === "keyValue"){
+                if (property.type === "keyValue") {
                     var key = ko.unwrap(this[property.name[0]]);
                     result[property.name[0]] = ko.observable(key);
-                }else{
+                } else {
                     result[property.name] = ko.observable(ko.unwrap(this[property.name]));
                 }
             }
             result.ma = this.ma;
             return result;
         }
-        
+
         viewModel.activeItem.fromItem = function (viewModel, item) {
-            for(var i=0; i<viewModel.propertiesList.length; i++){
+            for (var i = 0; i < viewModel.propertiesList.length; i++) {
                 var property = viewModel.propertiesList[i];
-                if(property.type === "keyValue"){
+                if (property.type === "keyValue") {
                     viewModel.activeItem[property.name[0]](ko.unwrap(item[property.name[0]]));
-                }else{
+                } else {
                     viewModel.activeItem[property.name](ko.unwrap(item[property.name]));
                 }
                 viewModel.activeItem.ma = item.ma;
             }
         };
-        
+
         viewModel.activeItem.fromDefaultValue = function (viewModel) {
-            for(var i=0; i<viewModel.propertiesList.length; i++){
+            for (var i = 0; i < viewModel.propertiesList.length; i++) {
                 var property = viewModel.propertiesList[i];
-                if(property.type === "keyValue"){
+                if (property.type === "keyValue") {
                     viewModel.activeItem[property.name[0]](property.defaultValue);
-                }else{
+                } else {
                     viewModel.activeItem[property.name](property.defaultValue);
                 }
             }
         };
-        
-        viewModel.setPropertiesList = function(p){
-            for(var i=0; i<p.length; i++){
+
+        viewModel.setPropertiesList = function (p) {
+            for (var i = 0; i < p.length; i++) {
                 var property = p[i];
-                if(property.type === "keyValue"){
+                if (property.type === "keyValue") {
                     this.activeItem[property.name[0]] = ko.observable(property.defaultValue);
-                }else{
+                } else {
                     this.activeItem[property.name] = ko.observable(property.defaultValue);
                 }
                 this.propertiesList.push(property);
             }
         }
-        
-        viewModel.load = function (viewModel){
-            viewModel.dataProvider.load(function(result){
+
+        viewModel.load = function (viewModel) {
+            viewModel.dataProvider.load(function (result) {
                 for (var d in result.comboBoxItemSource) {
-                    if(viewModel[d] === undefined){
+                    if (viewModel[d] === undefined) {
                         viewModel[d] = ko.observable();
                     }
                     viewModel[d](result.comboBoxItemSource[d]);
                 }
-                
+
                 viewModel.items(result.items);
-                
+
             }, function (error) {
-                    console.log("getItems error: " + JSON.stringify(error));
+                console.log("getItems error: " + JSON.stringify(error));
             });
         }
-        
-        viewModel.add = function (viewModel){
-            viewModel.dataProvider.add(viewModel.activeItem.toItem(viewModel), function(result){
-                
+
+        viewModel.add = function (viewModel) {
+            viewModel.dataProvider.add(viewModel.activeItem.toItem(viewModel), function (result) {
+
                 viewModel.items(result.items);
-                
+
             }, function (error) {
-                    console.log("getItems error: " + JSON.stringify(error));
+                console.log("getItems error: " + JSON.stringify(error));
             });
         }
-        
-        viewModel.update = function (){
-            viewModel.dataProvider.update(viewModel.activeItem.toItem(viewModel), function(result){
-                
+
+        viewModel.update = function () {
+            viewModel.dataProvider.update(viewModel.activeItem.toItem(viewModel), function (result) {
+
                 viewModel.items(result.items);
-                
+
             }, function (error) {
-                    console.log("getItems error: " + JSON.stringify(error));
+                console.log("getItems error: " + JSON.stringify(error));
             });
         }
-        
-        viewModel.remove = function (){
-            viewModel.dataProvider.remove(viewModel.activeItem.toItem(viewModel), function(result){
-                
+
+        viewModel.remove = function () {
+            viewModel.dataProvider.remove(viewModel.activeItem.toItem(viewModel), function (result) {
+
                 viewModel.items(result.items);
-                
+
             }, function (error) {
-                    console.log("getItems error: " + JSON.stringify(error));
+                console.log("getItems error: " + JSON.stringify(error));
             });
         }
-        
+
         return viewModel;
     }
 })();

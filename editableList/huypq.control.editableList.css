@@ -39,13 +39,13 @@ button {
 }
 
 ::-webkit-input-placeholder {
-   font-style: italic;
+    font-style: italic;
 }
 
-::-moz-placeholder {  /* Firefox 19+ */
-   font-style: italic;  
+::-moz-placeholder { /* Firefox 19+ */
+    font-style: italic;
 }
 
-:-ms-input-placeholder {  
-   font-style: italic;  
+:-ms-input-placeholder {
+    font-style: italic;
 }

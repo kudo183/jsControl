@@ -15,6 +15,7 @@
 
 <body>    
     <script src="../huy.control.utilsDOM.js"></script>
+    <script src="../datepicker/huy.ko.binding.datepicker.js"></script>
     <script src="../combobox/huy.ko.binding.combobox.js"></script>
     <script src="huypq.control.editableList.js"></script>
     <script src="fakeDataProvider.js"></script>
@@ -45,6 +46,12 @@
             type: "keyValue",
             defaultValue: 1,
             title: "Tai khoan:"
+        },
+        {
+            name: "ngay",
+            type: "date",
+            defaultValue: undefined,
+            title: "Ngay:"
         }]);
         
         var listTemplate =

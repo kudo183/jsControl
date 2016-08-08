@@ -71,7 +71,8 @@ window.app.fakeDataProvider = (function(){
                 maTaiKhoan: ko.unwrap(item.maTaiKhoan),
                 tenTaiKhoan: ko.unwrap(item.tenTaiKhoan),
                 maMucChi: ko.unwrap(item.maMucChi),
-                tenMucChi: ko.unwrap(item.tenMucChi)
+                tenMucChi: ko.unwrap(item.tenMucChi),
+                ngay: new Date(ko.unwrap(item.ngay))
             });
         }
         return result;
