@@ -18,6 +18,10 @@ window.huypq.control.editableList = (function () {
         view.append(editBlock);
         for (var i = 0; i < viewModel.propertiesList.length; i++) {
             var p = viewModel.propertiesList[i];
+            if (p.type === "hidden") {
+                continue;
+            }
+
             editBlock.append('<div>' + p.title + '</div>');
             if (p.type === "keyValue") {
                 var combobox = '<div data-bind="cbSelectedValue: '
@@ -127,12 +131,11 @@ window.huypq.control.editableList = (function () {
                 var property = viewModel.propertiesList[i];
                 if (property.type === "keyValue") {
                     var key = ko.unwrap(this[property.name[0]]);
-                    result[property.name[0]] = ko.observable(key);
+                    result[property.name[0]] = key;
                 } else {
-                    result[property.name] = ko.observable(ko.unwrap(this[property.name]));
+                    result[property.name] = ko.unwrap(this[property.name]);
                 }
             }
-            result.ma = this.ma;
             return result;
         }
 
@@ -144,7 +147,6 @@ window.huypq.control.editableList = (function () {
                 } else {
                     viewModel.activeItem[property.name](ko.unwrap(item[property.name]));
                 }
-                viewModel.activeItem.ma = item.ma;
             }
         };
 
