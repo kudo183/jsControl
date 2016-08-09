@@ -26,9 +26,9 @@ window.app.fakeDataProvider = (function(){
     dataProvider.load = function(done, fail){
         var result = {}
         result.items = this.getItems();
-        result.comboBoxItemSource = {};
-        result.comboBoxItemSource.taiKhoans = this.taiKhoans;
-        result.comboBoxItemSource.mucChis = this.mucChis;
+        result.comboBoxItemsSource = {};
+        result.comboBoxItemsSource.taiKhoans = this.taiKhoans;
+        result.comboBoxItemsSource.mucChis = this.mucChis;
         done(result);
     };
     

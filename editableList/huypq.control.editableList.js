@@ -164,6 +164,7 @@ window.huypq.control.editableList = (function () {
                 var property = p[i];
                 if (property.type === "keyValue") {
                     this.activeItem[property.name[0]] = ko.observable(property.defaultValue);
+                    this[property.name[2]] = ko.observableArray();
                 } else {
                     this.activeItem[property.name] = ko.observable(property.defaultValue);
                 }
@@ -173,11 +174,8 @@ window.huypq.control.editableList = (function () {
 
         viewModel.load = function (viewModel) {
             viewModel.dataProvider.load(function (result) {
-                for (var d in result.comboBoxItemSource) {
-                    if (viewModel[d] === undefined) {
-                        viewModel[d] = ko.observable();
-                    }
-                    viewModel[d](result.comboBoxItemSource[d]);
+                for (var d in result.comboBoxItemsSource) {
+                    viewModel[d](result.comboBoxItemsSource[d]);
                 }
 
                 viewModel.items(result.items);
