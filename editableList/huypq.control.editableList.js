@@ -81,7 +81,8 @@ window.huypq.control.editableList = (function () {
                 $(viewModel.btnSave).hide();
                 $(viewModel.btnDelete).hide();
                 viewModel.activeItem.fromDefaultValue(viewModel);
-                $(editBlock).show(100);
+                $(editBlock).show(200);
+                $(itemList).hide();
                 viewModel.toggleButtonText("&#x2227");
             } else {
                 view.hideEditBlock(viewModel);
@@ -99,11 +100,14 @@ window.huypq.control.editableList = (function () {
         viewModel.btnAdd = btnAdd;
         viewModel.btnSave = btnSave;
         viewModel.btnDelete = btnDelete;
+        viewModel.itemList = itemList;
 
         view.hideEditBlock = function (viewModel) {
-            $(viewModel.editBlock).hide(100);
+            $(viewModel.editBlock).hide();
+            $(viewModel.itemList).show(200);
             viewModel.toggleButtonText("&#x2228");
         };
+
         return view;
     }
 
@@ -118,7 +122,8 @@ window.huypq.control.editableList = (function () {
                 $(viewModel.btnSave).show();
                 $(viewModel.btnDelete).show();
                 viewModel.activeItem.fromItem(viewModel, this);
-                $(viewModel.editBlock).show(100);
+                $(viewModel.editBlock).show(200);
+                $(viewModel.itemList).hide();
                 viewModel.toggleButtonText("&#x2227");
             },
             editBlock: {},
