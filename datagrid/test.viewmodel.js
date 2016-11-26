@@ -1,7 +1,7 @@
 ﻿window.app = window.app || {};
 window.app.viewModel = window.app.viewModel || {};
 window.app.viewModel.testViewModel = (function () {
-    var viewModel = huy.control.dataGrid.createViewModel(window.app.fakeDataProvider, { hasDeleteButton: true });
+    var viewModel = huypq.control.dataGrid.createViewModel(window.app.fakeDataProvider, { hasDeleteButton: true });
     viewModel.addColumn({
         headerText: "Col1",
         type: "span",

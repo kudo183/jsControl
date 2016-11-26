@@ -4,18 +4,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="huy.ko.binding.comboBox.css" rel="stylesheet">
+    <link href="huypq.ko.binding.comboBox.css" rel="stylesheet">
     <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js'></script>
     <script>
+	//window.huypq_DEBUG = true;
     </script>
 </head>
 
 <body>
-
     <button onclick="btnChangeSelectedValue();">Change Selected Value</button>
     <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js'></script>
-    <script type='text/javascript' src='../huy.control.utilsDOM.js'></script>
-    <script type='text/javascript' src='huy.ko.binding.comboBox.js'></script>
+    <script type='text/javascript' src='../huypq.control.utilsDOM.js'></script>
+    <script type='text/javascript' src='huypq.ko.binding.comboBox.js'></script>
     <input id="inputvalue" />
     <button onclick="handleClick1();">Show Selected</button>
     <button onclick="btnChangeItems();">Change Items</button>
@@ -26,6 +26,7 @@
     </div>
     <div id="performanceTest"></div>
     <script>
+	window.huypq.DEBUG = true;
         var model = {
             value: ko.observable(2),
             items: ko.observableArray()
