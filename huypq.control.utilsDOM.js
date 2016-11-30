@@ -2,9 +2,7 @@
 window.huypq.control = window.huypq.control || {};
 
 if(window.huypq_DEBUG === true){
-	window.huypq.log = function (text) {
-		console.log(text);
-	};
+    window.huypq.log = console.log;
 }
 
 window.huypq.control.utilsDOM = (function () {

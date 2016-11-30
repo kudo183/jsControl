@@ -1,8 +1,6 @@
 ﻿window.huypq = window.huypq || {};
-window.huypq.log = window.huypq.log || function (text) {
-};
-
 window.huypq.control = window.huypq.control || {};
+
 window.huypq.control.headerMenu = (function () {
     var headerMenu = {
         createView: createView

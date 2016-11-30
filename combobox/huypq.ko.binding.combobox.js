@@ -1,8 +1,9 @@
 ﻿window.huypq = window.huypq || {};
-window.huypq.log = window.huypq.log || function (text) {
-};
 
 (function () {
+    var log = window.huypq.log || function (text) { };
+    var info = console.log;
+
     ko.bindingHandlers.cbSelectedValue = {
         after: ['cbItems'],
         update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
@@ -12,22 +13,22 @@ window.huypq.log = window.huypq.log || function (text) {
             }
             element._selectedValue = value;
             element._setSelectedValue(value);
-            huypq.log("cbSelectedValue update");
+            info("cbSelectedValue update: " + allBindings.get("cbItemText") + " " + JSON.stringify(value));
         }
     };
     ko.bindingHandlers.cbItems = {
         init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-            huypq.log("cbItems init");
+            log("cbItems init");
             initComboBox(element, allBindings);
         },
         update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-            huypq.log("cbItems update");
+            log("cbItems update");
             element._setItems(ko.unwrap(valueAccessor()));
         }
     };
 
     function initComboBox(element, allBindings) {
-        huypq.log("initComboBox");
+        log("initComboBox");
 
         var comboBox = element;
         comboBox._listDiv = {};
@@ -69,7 +70,7 @@ window.huypq.log = window.huypq.log || function (text) {
         comboBox._button.onclick = fnButtonOnClick;
 
         function fnOnInput() {
-            huypq.log("fnOnInput: " + this.value);
+            log("fnOnInput: " + this.value);
 
             filterItems(this.value);
             renderItems(comboBox._ul, comboBox._filteredItems);
@@ -82,11 +83,11 @@ window.huypq.log = window.huypq.log || function (text) {
         }
 
         function fnInputOnBlur() {
-            huypq.log("fnInputOnBlur");
+            log("fnInputOnBlur");
             if ($(comboBox._listDiv).is(":visible") === true) {
                 hideListTimer = setTimeout(cancelChangeAndHideList, 300);
 
-                huypq.log("isValid when lostFocus:" + $(this)[0].validity.valid);
+                log("isValid when lostFocus:" + $(this)[0].validity.valid);
             }
         }
 
@@ -120,11 +121,11 @@ window.huypq.log = window.huypq.log || function (text) {
                     break;
             }
 
-            huypq.log("onkeydown: " + event.keyCode);
+            log("onkeydown: " + event.keyCode);
         }
 
         function fnButtonOnClick() {
-            huypq.log("fnButtonOnClick");
+            log("fnButtonOnClick");
             clearTimeout(hideListTimer);
 
             if ($(comboBox._listDiv).is(":visible")) {
@@ -138,7 +139,7 @@ window.huypq.log = window.huypq.log || function (text) {
         }
 
         function fnSetSelectedValue(value) {
-            huypq.log("fnSetSelectedValue");
+            log("fnSetSelectedValue");
             var textValue = $(comboBox._input).val();
             if (typeof value === "undefined" && typeof textValue !== "undefined") {
                 setInputText(undefined);
@@ -163,7 +164,7 @@ window.huypq.log = window.huypq.log || function (text) {
         }
 
         function fnSetItems(items) {
-            huypq.log("fnSetItems");
+            log("fnSetItems");
             setInputText(undefined);
             comboBox._items = items;
 
@@ -171,7 +172,7 @@ window.huypq.log = window.huypq.log || function (text) {
         }
 
         function cancelChangeAndHideList() {
-            huypq.log("cancelChangeAndHideList");
+            log("cancelChangeAndHideList");
 
             comboBox._filteredItems = [];
             for (var i = 0; i < comboBox._items.length; i++) {
@@ -187,7 +188,7 @@ window.huypq.log = window.huypq.log || function (text) {
         }
 
         function setValueAndHideList() {
-            huypq.log("setValueAndHideList");
+            log("setValueAndHideList");
             var item = comboBox._filteredItems[comboBox._selectedItemIndex];
             var text = getItemText(item);
             setInputText(text);
@@ -201,7 +202,7 @@ window.huypq.log = window.huypq.log || function (text) {
         }
 
         function highlightItem(index) {
-            huypq.log("highlightItem");
+            log("highlightItem");
 
             $(comboBox._ul).children().eq(comboBox._selectedItemIndex).removeClass("h-boundlist-selected");
 
@@ -209,12 +210,12 @@ window.huypq.log = window.huypq.log || function (text) {
             elem.addClass("h-boundlist-selected");
 
             window.huypq.control.utilsDOM.scrollToViewElement(comboBox._listDiv, elem);
-            
+
             comboBox._selectedItemIndex = index;
         }
 
         function hideList() {
-            huypq.log("hideList");
+            log("hideList");
             clearTimeout(hideListTimer);
             $(comboBox._listDiv).hide();
             $(comboBox._ul).empty();
@@ -226,14 +227,14 @@ window.huypq.log = window.huypq.log || function (text) {
         }
 
         function selectItem(li) {
-            huypq.log("selectItem:" + li.innerText);
+            log("selectItem:" + li.innerText);
             highlightItem(li._index);
             setValueAndHideList();
             focusInputAndSelectAllText();
         }
 
         function filterItems(value) {
-            huypq.log("filterItems");
+            log("filterItems");
             comboBox._filteredItems = [];
             for (var i = 0; i < comboBox._items.length; i++) {
                 if (getItemText(comboBox._items[i]).search(new RegExp(value.replace("\\", "\\\\"), "i")) == 0) {
@@ -243,46 +244,46 @@ window.huypq.log = window.huypq.log || function (text) {
         }
 
         function renderItems(ul, items) {
-            huypq.log("renderItems");
+            log("renderItems");
             $(comboBox._ul).empty();
 
             for (var i = 0; i < items.length; i++) {
                 var li = window.huypq.control.utilsDOM.createElement("li", {}, undefined, getItemText(items[i]));
                 li._index = i;
                 li.onclick = function () {
-                    huypq.log("li onclick");
+                    log("li onclick");
                     selectItem(this);
                 };
                 li.ontouchstart = function () {//for chrome tablet, chrome tablet onclick work incorrect
-                    huypq.log("li ontouchstart");
+                    log("li ontouchstart");
                     selectItemTimer = setTimeout(selectItem.bind(null, this), 300);
                 };
                 li.ontouchmove = function () {
-                    huypq.log("li ontouchmove");
+                    log("li ontouchmove");
                     clearTimeout(selectItemTimer);
                 };
 
                 li.onmouseover = function () {
-                    huypq.log("li onmouseover");
+                    log("li onmouseover");
                     highlightItem(this._index);
                 };
                 ul.appendChild(li);
             }
 
             $(comboBox._listDiv).show();
-            
+
             highlightItem(0);
         }
 
         function setInputText(text) {
-            huypq.log("setInputText: " + text);
+            log("setInputText: " + text);
             $(comboBox._input).val(text);
         }
 
         function getItemText(item) {
             if (allBindings.has("cbItemText")) {
                 var t = allBindings.get("cbItemText");
-                if(item === undefined){
+                if (item === undefined) {
                     return undefined;
                 }
                 var u = ko.unwrap(item);
@@ -296,7 +297,7 @@ window.huypq.log = window.huypq.log || function (text) {
         function getItemValue(item) {
             if (allBindings.has("cbItemValue")) {
                 var t = allBindings.get("cbItemValue");
-                if(item === undefined){
+                if (item === undefined) {
                     return undefined;
                 }
                 var u = ko.unwrap(item);
