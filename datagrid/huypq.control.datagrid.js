@@ -1,9 +1,10 @@
 ﻿window.huypq = window.huypq || {};
-window.huypq.log = window.huypq.log || function (text) {
-};
-
 window.huypq.control = window.huypq.control || {};
+
 window.huypq.control.dataGrid = (function () {
+    var log = window.huypq.log || function (text) { };
+    var info = console.log;
+
     var dataGrid = {
         createView: createView,
         createViewModel: createViewModel
@@ -31,7 +32,7 @@ window.huypq.control.dataGrid = (function () {
 
                 root.previousSelectedItem = ko.unwrap(root.currentSelectedItem);
                 root.currentSelectedItem(item);
-                huypq.log(index + JSON.stringify(ko.toJS(item)));
+                info("datagrid selected index: " + index + "item: " + JSON.stringify(ko.toJS(item)));
                 return true;
             },
             addCustomFilters: addCustomFilters,
@@ -51,7 +52,7 @@ window.huypq.control.dataGrid = (function () {
                                 v = root._columns[i].defaultValue;
                             }
                             item[root._columns[i].cellValueProperty] = ko.observable(v);
-                            huypq.log(root._columns[i].cellValueProperty + " default value: " + v);
+                            log(root._columns[i].cellValueProperty + " default value: " + v);
                         }
                         item.isSelected = ko.observable(false);
                         root.items.push(item);
@@ -104,7 +105,7 @@ window.huypq.control.dataGrid = (function () {
             if (root._isSkipLoadFunction === true) {
                 return;
             }
-            huypq.log("load");
+            
             var filter = {};
             filter.whereOptions = [];
             for (var i = 0; i < root._columns.length; i++) {
@@ -112,6 +113,7 @@ window.huypq.control.dataGrid = (function () {
                 var v = ko.unwrap(c.filterValue);
                 if (v !== undefined) {
                     filter.whereOptions.push({
+                        $type: c.whereType,
                         predicate: "=",
                         propertyPath: c.cellValueProperty,
                         value: v
@@ -123,6 +125,7 @@ window.huypq.control.dataGrid = (function () {
                 var v = ko.unwrap(c.filterValue);
                 if (v !== undefined) {
                     filter.whereOptions.push({
+                        $type: c.whereType,
                         predicate: "=",
                         propertyPath: c.propertyPath,
                         value: v
@@ -162,8 +165,9 @@ window.huypq.control.dataGrid = (function () {
                 root.itemsRemoved = [];
                 root.itemsAdded = [];
                 root._isSkipLoadFunction = false;
+                log("datagrid loaded");
             }, function (error) {
-                huypq.log("getItems error: " + JSON.stringify(error));
+                log("datagrid getItems error: " + JSON.stringify(error));
             });
         }
 
@@ -174,7 +178,7 @@ window.huypq.control.dataGrid = (function () {
         }
 
         function save(root) {
-            huypq.log("save");
+            
             var changes = [];
 
             var uItems = ko.unwrap(root.items);
@@ -200,6 +204,8 @@ window.huypq.control.dataGrid = (function () {
                 changes.push({ state: "d", data: root._dataProvider.toEntity(item) });
             }
 
+            log("datagrid changes " + JSON.stringify(changes));
+
             root._dataProvider.saveChangesAjax(changes, function (result) {
                 for (i = 0; i < itemsAdded.length; i++) {
                     root._dataProvider.setItemId(root.itemsAdded[i], result[i]);
@@ -210,6 +216,7 @@ window.huypq.control.dataGrid = (function () {
                 for (i = 0; i < uItems.length; i++) {
                     uItems[i]._changed = false;
                 }
+                log("datagrid saved")
             });
         }
 
