@@ -9,6 +9,7 @@ window.huypq.dateTimeUtils = (function () {
     function getCurrentDate() {
         var today = new Date();
         today.setHours(0, 0, 0, 0);
+        today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
         return today;
     }
 })();
