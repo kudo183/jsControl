@@ -1,8 +1,13 @@
 ﻿window.huypq = window.huypq || {};
+window.huypq.comboboxLog = window.huypq.comboboxLog || function (logLevel, msg) {
+    if (logLevel === "INFO") {
+        console.log(msg);
+    } else if (typeof (window.huypq.log) !== "undefined") {
+        window.huypq.log(msg);
+    }
+};
 
-(function () {
-    var log = window.huypq.log || function (text) { };
-    var info = console.log;
+(function (logger) {
 
     ko.bindingHandlers.cbSelectedValue = {
         after: ['cbItems'],
@@ -13,22 +18,22 @@
             }
             element._selectedValue = value;
             element._setSelectedValue(value);
-            info("cbSelectedValue update: " + allBindings.get("cbItemText") + " " + JSON.stringify(value));
+            logger("INFO", "cbSelectedValue update: " + allBindings.get("cbItemText") + " " + JSON.stringify(value));
         }
     };
     ko.bindingHandlers.cbItems = {
         init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-            log("cbItems init");
+            logger("cbItems init");
             initComboBox(element, allBindings);
         },
         update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-            log("cbItems update");
+            logger("cbItems update");
             element._setItems(ko.unwrap(valueAccessor()));
         }
     };
 
     function initComboBox(element, allBindings) {
-        log("initComboBox");
+        logger("initComboBox");
 
         var comboBox = element;
         comboBox._listDiv = {};
@@ -70,7 +75,7 @@
         comboBox._button.onclick = fnButtonOnClick;
 
         function fnOnInput() {
-            log("fnOnInput: " + this.value);
+            logger("fnOnInput: " + this.value);
 
             filterItems(this.value);
             renderItems(comboBox._ul, comboBox._filteredItems);
@@ -83,11 +88,11 @@
         }
 
         function fnInputOnBlur() {
-            log("fnInputOnBlur");
+            logger("fnInputOnBlur");
             if ($(comboBox._listDiv).is(":visible") === true) {
                 hideListTimer = setTimeout(cancelChangeAndHideList, 300);
 
-                log("isValid when lostFocus:" + $(this)[0].validity.valid);
+                logger("isValid when lostFocus:" + $(this)[0].validity.valid);
             }
         }
 
@@ -121,11 +126,11 @@
                     break;
             }
 
-            log("onkeydown: " + event.keyCode);
+            logger("onkeydown: " + event.keyCode);
         }
 
         function fnButtonOnClick() {
-            log("fnButtonOnClick");
+            logger("fnButtonOnClick");
             clearTimeout(hideListTimer);
 
             if ($(comboBox._listDiv).is(":visible")) {
@@ -139,7 +144,7 @@
         }
 
         function fnSetSelectedValue(value) {
-            log("fnSetSelectedValue");
+            logger("fnSetSelectedValue");
             var textValue = $(comboBox._input).val();
             if (typeof value === "undefined" && typeof textValue !== "undefined") {
                 setInputText(undefined);
@@ -164,7 +169,7 @@
         }
 
         function fnSetItems(items) {
-            log("fnSetItems");
+            logger("fnSetItems");
             setInputText(undefined);
             comboBox._items = items;
 
@@ -172,7 +177,7 @@
         }
 
         function cancelChangeAndHideList() {
-            log("cancelChangeAndHideList");
+            logger("cancelChangeAndHideList");
 
             comboBox._filteredItems = [];
             for (var i = 0; i < comboBox._items.length; i++) {
@@ -188,7 +193,7 @@
         }
 
         function setValueAndHideList() {
-            log("setValueAndHideList");
+            logger("setValueAndHideList");
             var item = comboBox._filteredItems[comboBox._selectedItemIndex];
             var text = getItemText(item);
             setInputText(text);
@@ -202,7 +207,7 @@
         }
 
         function highlightItem(index) {
-            log("highlightItem");
+            logger("highlightItem");
 
             $(comboBox._ul).children().eq(comboBox._selectedItemIndex).removeClass("h-boundlist-selected");
 
@@ -215,7 +220,7 @@
         }
 
         function hideList() {
-            log("hideList");
+            logger("hideList");
             clearTimeout(hideListTimer);
             $(comboBox._listDiv).hide();
             $(comboBox._ul).empty();
@@ -227,14 +232,14 @@
         }
 
         function selectItem(li) {
-            log("selectItem:" + li.innerText);
+            logger("selectItem:" + li.innerText);
             highlightItem(li._index);
             setValueAndHideList();
             focusInputAndSelectAllText();
         }
 
         function filterItems(value) {
-            log("filterItems");
+            logger("filterItems");
             comboBox._filteredItems = [];
             for (var i = 0; i < comboBox._items.length; i++) {
                 if (getItemText(comboBox._items[i]).search(new RegExp(value.replace("\\", "\\\\"), "i")) == 0) {
@@ -244,27 +249,27 @@
         }
 
         function renderItems(ul, items) {
-            log("renderItems");
+            logger("renderItems");
             $(comboBox._ul).empty();
 
             for (var i = 0; i < items.length; i++) {
                 var li = window.huypq.control.utilsDOM.createElement("li", {}, undefined, getItemText(items[i]));
                 li._index = i;
                 li.onclick = function () {
-                    log("li onclick");
+                    logger("li onclick");
                     selectItem(this);
                 };
                 li.ontouchstart = function () {//for chrome tablet, chrome tablet onclick work incorrect
-                    log("li ontouchstart");
+                    logger("li ontouchstart");
                     selectItemTimer = setTimeout(selectItem.bind(null, this), 300);
                 };
                 li.ontouchmove = function () {
-                    log("li ontouchmove");
+                    logger("li ontouchmove");
                     clearTimeout(selectItemTimer);
                 };
 
                 li.onmouseover = function () {
-                    log("li onmouseover");
+                    logger("li onmouseover");
                     highlightItem(this._index);
                 };
                 ul.appendChild(li);
@@ -276,7 +281,7 @@
         }
 
         function setInputText(text) {
-            log("setInputText: " + text);
+            logger("setInputText: " + text);
             $(comboBox._input).val(text);
         }
 
@@ -308,4 +313,4 @@
             return ko.unwrap(item);
         }
     }
-})();
+})(window.huypq.comboboxLog);

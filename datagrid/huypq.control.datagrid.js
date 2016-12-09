@@ -1,9 +1,15 @@
 ﻿window.huypq = window.huypq || {};
 window.huypq.control = window.huypq.control || {};
 
-window.huypq.control.dataGrid = (function () {
-    var log = window.huypq.log || function (text) { };
-    var info = console.log;
+window.huypq.control.dataGridLog = window.huypq.control.dataGridLog || function (logLevel, msg) {
+    if (logLevel === "INFO") {
+        console.log(msg);
+    } else if (typeof (window.huypq.log) !== "undefined") {
+        window.huypq.log(msg);
+    }
+};
+
+window.huypq.control.dataGrid = (function (logger) {
 
     var dataGrid = {
         createView: createView,
@@ -32,7 +38,7 @@ window.huypq.control.dataGrid = (function () {
 
                 root.previousSelectedItem = ko.unwrap(root.currentSelectedItem);
                 root.currentSelectedItem(item);
-                info("datagrid selected index: " + index + "item: " + JSON.stringify(ko.toJS(item)));
+                logger("INFO", "datagrid selected index: " + index + "item: " + JSON.stringify(ko.toJS(item)));
                 return true;
             },
             addCustomFilters: addCustomFilters,
@@ -52,7 +58,7 @@ window.huypq.control.dataGrid = (function () {
                                 v = root._columns[i].defaultValue;
                             }
                             item[root._columns[i].cellValueProperty] = ko.observable(v);
-                            log(root._columns[i].cellValueProperty + " default value: " + v);
+                            logger(root._columns[i].cellValueProperty + " default value: " + v);
                         }
                         item.isSelected = ko.observable(false);
                         root.items.push(item);
@@ -98,7 +104,7 @@ window.huypq.control.dataGrid = (function () {
         }
 
         viewModel.paging.currentPageIndex.subscribe(function () { viewModel.load(viewModel); });
-
+        
         return viewModel;
 
         function load(root) {
@@ -165,9 +171,9 @@ window.huypq.control.dataGrid = (function () {
                 root.itemsRemoved = [];
                 root.itemsAdded = [];
                 root._isSkipLoadFunction = false;
-                log("datagrid loaded");
+                logger("datagrid loaded");
             }, function (error) {
-                log("datagrid getItems error: " + JSON.stringify(error));
+                logger("datagrid getItems error: " + JSON.stringify(error));
             });
         }
 
@@ -178,7 +184,7 @@ window.huypq.control.dataGrid = (function () {
         }
 
         function save(root) {
-            
+
             var changes = [];
 
             var uItems = ko.unwrap(root.items);
@@ -204,7 +210,7 @@ window.huypq.control.dataGrid = (function () {
                 changes.push({ state: "d", data: root._dataProvider.toEntity(item) });
             }
 
-            log("datagrid changes " + JSON.stringify(changes));
+            logger("datagrid changes " + JSON.stringify(changes));
 
             root._dataProvider.saveChangesAjax(changes, function (result) {
                 for (i = 0; i < itemsAdded.length; i++) {
@@ -216,7 +222,7 @@ window.huypq.control.dataGrid = (function () {
                 for (i = 0; i < uItems.length; i++) {
                     uItems[i]._changed = false;
                 }
-                log("datagrid saved")
+                logger("datagrid saved")
             });
         }
 
@@ -310,7 +316,7 @@ window.huypq.control.dataGrid = (function () {
             hasColumnFilter: true,
             hasBottomToolbar: true
         };
-
+        
         var view = window.huypq.control.utilsDOM.createElement("div", { id: id }, undefined, undefined, "h-dataGrid");
 
         if (settings.hasCustomFilter === true) {
@@ -571,4 +577,4 @@ window.huypq.control.dataGrid = (function () {
         }
     }
 
-})();
+})(window.huypq.control.dataGridLog);
