@@ -230,10 +230,6 @@ window.huypq.control.dataGrid = (function (logger) {
             for (var i = 0; i < customFilters.length; i++) {
                 var customFilter = customFilters[i];
                 viewModel._customFilter.push(customFilter);
-                if (customFilter.type === "comboBox") {
-                    viewModel.comboBoxItemsSource[customFilter.itemsSourceName] =
-                        viewModel.comboBoxItemsSource[customFilter.itemsSourceName] || ko.observableArray();
-                }
                 customFilter.filterValue.subscribe(function () {
                     viewModel._isSkipLoadFunction = true;
                     viewModel.paging.currentPageIndex(1);
@@ -352,7 +348,7 @@ window.huypq.control.dataGrid = (function (logger) {
 
             //comboBox
             cell = createCustomFilterCellDiv();
-            addColumnFilterCell(row, cell, "cbSelectedValue: filterValue, cbItems: $parents[0].comboBoxItemsSource[itemsSourceName], cbItemText: itemText, cbItemValue: itemValue"
+            addColumnFilterCell(row, cell, "cbSelectedValue: filterValue, cbItems: itemsSource, cbItemText: itemText, cbItemValue: itemValue"
             , 'comboBox', "div", {});
 
             //date
