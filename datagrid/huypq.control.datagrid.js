@@ -26,7 +26,6 @@ window.huypq.control.dataGrid = (function (logger) {
             items: ko.observableArray(),
             itemsRemoved: [],
             itemsAdded: [],
-            comboBoxItemsSource: {},
             currentSelectedItem: ko.observable(),
             previousSelectedItem: {},
             _rowClicked: function (root, index, item) {
@@ -38,7 +37,7 @@ window.huypq.control.dataGrid = (function (logger) {
 
                 root.previousSelectedItem = ko.unwrap(root.currentSelectedItem);
                 root.currentSelectedItem(item);
-                logger("INFO", "datagrid selected index: " + index + "item: " + JSON.stringify(ko.toJS(item)));
+                logger("INFO", "datagrid selected index: " + index + " item ID: " + ko.unwrap(root._dataProvider.getItemId(item)));
                 return true;
             },
             addCustomFilters: addCustomFilters,
@@ -61,6 +60,7 @@ window.huypq.control.dataGrid = (function (logger) {
                             logger(root._columns[i].cellValueProperty + " default value: " + v);
                         }
                         item.isSelected = ko.observable(false);
+                        root._dataProvider.processNewAddedItem(item);
                         root.items.push(item);
                         root.itemsAdded.push(item);
                     }
@@ -104,14 +104,14 @@ window.huypq.control.dataGrid = (function (logger) {
         }
 
         viewModel.paging.currentPageIndex.subscribe(function () { viewModel.load(viewModel); });
-        
+
         return viewModel;
 
         function load(root) {
             if (root._isSkipLoadFunction === true) {
                 return;
             }
-            
+
             var filter = {};
             filter.whereOptions = [];
             for (var i = 0; i < root._columns.length; i++) {
@@ -160,10 +160,6 @@ window.huypq.control.dataGrid = (function (logger) {
                     }
                 }
 
-                for (var d in result.comboBoxItemsSource) {
-                    root.comboBoxItemsSource[d](result.comboBoxItemsSource[d]);
-                }
-
                 root.items(result.items);
                 root._isSkipLoadFunction = true;
                 root.paging.pageCount(result.pageCount);
@@ -194,35 +190,30 @@ window.huypq.control.dataGrid = (function (logger) {
                 item = uItems[i];
                 if (ko.unwrap(root._dataProvider.getItemId(item)) !== 0 &&
                     item._changed === true) {
-                    changes.push({ state: "u", data: root._dataProvider.toEntity(item) });
+                    item.state = 3;
+                    changes.push(root._dataProvider.toDto(item));
                 }
             }
 
             var itemsAdded = root.itemsAdded;
             for (i = 0; i < itemsAdded.length; i++) {
                 item = itemsAdded[i];
-                changes.push({ state: "a", data: root._dataProvider.toEntity(item) });
+                item.state = 1;
+                changes.push(root._dataProvider.toDto(item));
             }
 
             var itemsRemoved = root.itemsRemoved;
             for (i = 0; i < itemsRemoved.length; i++) {
                 item = itemsRemoved[i];
-                changes.push({ state: "d", data: root._dataProvider.toEntity(item) });
+                item.state = 2;
+                changes.push(root._dataProvider.toDto(item));
             }
 
             logger("datagrid changes " + JSON.stringify(changes));
 
             root._dataProvider.saveChangesAjax(changes, function (result) {
-                for (i = 0; i < itemsAdded.length; i++) {
-                    root._dataProvider.setItemId(root.itemsAdded[i], result[i]);
-                }
-
-                root.itemsRemoved = [];
-                root.itemsAdded = [];
-                for (i = 0; i < uItems.length; i++) {
-                    uItems[i]._changed = false;
-                }
-                logger("datagrid saved")
+                logger("datagrid saved: " + result);
+                root.load(root);
             });
         }
 
@@ -241,10 +232,7 @@ window.huypq.control.dataGrid = (function (logger) {
 
         function addColumn(column) {
             viewModel._columns.push(column);
-            if (column.type === "comboBox") {
-                viewModel.comboBoxItemsSource[column.itemsSourceName] =
-                    viewModel.comboBoxItemsSource[column.itemsSourceName] || ko.observableArray();
-            }
+
             column.filterValue.subscribe(function () {
                 viewModel._isSkipLoadFunction = true;
                 viewModel.paging.currentPageIndex(1);
@@ -312,7 +300,7 @@ window.huypq.control.dataGrid = (function (logger) {
             hasColumnFilter: true,
             hasBottomToolbar: true
         };
-        
+
         var view = window.huypq.control.utilsDOM.createElement("div", { id: id }, undefined, undefined, "h-dataGrid");
 
         if (settings.hasCustomFilter === true) {
@@ -349,7 +337,7 @@ window.huypq.control.dataGrid = (function (logger) {
             //comboBox
             cell = createCustomFilterCellDiv();
             addColumnFilterCell(row, cell, "cbSelectedValue: filterValue, cbItems: itemsSource, cbItemText: itemText, cbItemValue: itemValue"
-            , 'comboBox', "div", {});
+                , 'comboBox', "div", {});
 
             //date
             cell = createCustomFilterCellDiv();
@@ -358,7 +346,7 @@ window.huypq.control.dataGrid = (function (logger) {
             //action
             cell = createCustomFilterCellDiv();
             addCell(row, cell, "html:text, click: function(data, event) { action($parents[0], 'filter', data, event) }"
-            , 'action', "button", {});
+                , 'action', "button", {});
 
             //template
             cell = window.huypq.control.utilsDOM.createElement("div", {}, "template: {name: filterTemplate}", undefined, "customFilterCell");
@@ -401,8 +389,8 @@ window.huypq.control.dataGrid = (function (logger) {
 
             //comboBox
             cell = createColumnFilterCellDiv();
-            addColumnFilterCell(row, cell, "cbSelectedValue: filterValue, cbItems: $parents[0].comboBoxItemsSource[itemsSourceName], cbItemText: itemText, cbItemValue: itemValue"
-            , 'comboBox', "div", {});
+            addColumnFilterCell(row, cell, "cbSelectedValue: filterValue, cbItems: filterItemsSource, cbItemText: itemText, cbItemValue: itemValue"
+                , 'comboBox', "div", {});
 
             //date
             cell = createColumnFilterCellDiv();
@@ -411,7 +399,7 @@ window.huypq.control.dataGrid = (function (logger) {
             //action
             cell = createColumnFilterCellDiv();
             addCell(row, cell, "html:text, click: function(data, event) { action($parents[0], 'filter', data, event) }"
-            , 'action', "button", {});
+                , 'action', "button", {});
 
             //template
             cell = window.huypq.control.utilsDOM.createElement("div", {}, "css:'col'+($index()+1) + ' columnFilter', template: {name: filterTemplate}", undefined, "cell");
@@ -468,10 +456,10 @@ window.huypq.control.dataGrid = (function (logger) {
             var row, cell;
             if (style === "row") {
                 row = window.huypq.control.utilsDOM.createElement(
-                "div", {}, "click: function(data, event){return $parents[0]._rowClicked($parents[0], $index(), data, event)}, foreach: $parent._columns, css: css() + ' ' + (isSelected()?' selected':'')", undefined, "row");
+                    "div", {}, "click: function(data, event){return $parents[0]._rowClicked($parents[0], $index(), data, event)}, foreach: $parent._columns, css: css() + ' ' + (isSelected()?' selected':'')", undefined, "row");
             } else {
                 row = window.huypq.control.utilsDOM.createElement(
-                "div", {}, "click: function(data, event){return $parents[0]._rowClicked($parents[0], $index(), data, event)}, foreach: $parent._columns, css: (isSelected()?' selected':'')", undefined, "row");
+                    "div", {}, "click: function(data, event){return $parents[0]._rowClicked($parents[0], $index(), data, event)}, foreach: $parent._columns, css: (isSelected()?' selected':'')", undefined, "row");
             }
 
             //readonly text
@@ -488,8 +476,8 @@ window.huypq.control.dataGrid = (function (logger) {
 
             //comboBox
             cell = createCellDiv();
-            addCell(row, cell, "cbSelectedValue: $parent[cellValueProperty], cbItems: $parents[1].comboBoxItemsSource[itemsSourceName], cbItemText: itemText, cbItemValue: itemValue"
-            , 'comboBox', "div", {});
+            addCell(row, cell, "cbSelectedValue: $parent[cellValueProperty], cbItems: $parent[itemsSourceName], cbItemText: itemText, cbItemValue: itemValue"
+                , 'comboBox', "div", {});
 
             //date
             cell = createCellDiv();
@@ -498,7 +486,7 @@ window.huypq.control.dataGrid = (function (logger) {
             //action
             cell = createCellDiv();
             addCell(row, cell, "html:text, click: function(data, event) { action($parents[1], $parent, data, event) }"
-            , 'action', "button", {});
+                , 'action', "button", {});
 
             //template
             cell = window.huypq.control.utilsDOM.createElement("div", {}, "css:'col'+($index()+1), template: {name: cellTemplate}", undefined, "cell");
