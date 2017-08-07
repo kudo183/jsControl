@@ -12,20 +12,25 @@ window.huypq.arrayUtils = (function () {
             var nameA = a[sortProperty].toUpperCase(); // ignore upper and lowercase
             var nameB = b[sortProperty].toUpperCase(); // ignore upper and lowercase
             if (isAscending === true) {
-                if (nameA < nameB) {
-                    return -1;
-                }
-                if (nameA > nameB) {
-                    return 1;
-                }
+                return nameA.localeCompare(nameB);
             } else {
-                if (nameA < nameB) {
-                    return 1;
-                }
-                if (nameA > nameB) {
-                    return -1;
-                }
+                return nameB.localeCompare(nameA);
             }
+            //if (isAscending === true) {
+            //    if (nameA < nameB) {
+            //        return -1;
+            //    }
+            //    if (nameA > nameB) {
+            //        return 1;
+            //    }
+            //} else {
+            //    if (nameA < nameB) {
+            //        return 1;
+            //    }
+            //    if (nameA > nameB) {
+            //        return -1;
+            //    }
+            //}
             // names must be equal
             return 0;
         });
