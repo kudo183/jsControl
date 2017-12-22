@@ -1,28 +1,41 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
-
 <head>
-<meta charset="utf-8">
-<meta name=viewport content="width=device-width, initial-scale=1">
-<link href="huypq.control.datagrid.css" rel="stylesheet">
-<link href="../combobox/huypq.ko.binding.combobox.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.css" rel="stylesheet">
-<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js'></script>
-<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.js'></script>
+    <meta charset="utf-8">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <link href="huypq.control.datagrid.css" rel="stylesheet">
+    <link href="../combobox/huypq.ko.binding.combobox.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.css" rel="stylesheet">
+    <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js'></script>
+    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.js'></script>
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            max-width: 1024px;
+            margin: auto;
+        }
+        #dataGrid {
+            width: 500px;
+            height: 500px;
+        }
+    </style>
 </head>
 
-<body>	
-	<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js'></script>
-	<script type='text/javascript' src='../huypq.control.utilsDOM.js'></script>
-	<script type='text/javascript' src='../combobox/huypq.ko.binding.combobox.js'></script>
+<body>
+    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js'></script>
+    <script type='text/javascript' src='../huypq.dateTimeUtils.js'></script>
+    <script type='text/javascript' src='../huypq.control.utilsDOM.js'></script>
+    <script type='text/javascript' src='../combobox/huypq.ko.binding.combobox.js'></script>
     <script type='text/javascript' src='../datepicker/huypq.ko.binding.datepicker.js'></script>
-	<script type='text/javascript' src='huypq.control.datagrid.js'></script>
-	<script type='text/javascript' src='fakeDataProvider.js'></script>
-	<script type='text/javascript' src='test.viewmodel.js'></script>
-	<div id="test"></div>
-	<button onclick="console.log(window.app.viewModel.testViewModel.toString());">Test</button>
-	<script>
-		var view = huypq.control.dataGrid.createView("dataGrid",
+    <script type='text/javascript' src='huypq.control.datagrid.js'></script>
+    <script type='text/javascript' src='fakeDataProvider.js'></script>
+    <script type='text/javascript' src='test.viewmodel.js'></script>
+
+    <button onclick="console.log(window.app.viewModel.testViewModel.toString());">Test</button>
+    <script>
+        var view = huypq.control.dataGrid.createView("dataGrid",
             {
                 hasCustomFilter: true,
                 hasColumnHeader: true,
@@ -30,9 +43,9 @@
                 hasBottomToolbar: true
             }
         );
-		$("#test").append(view);
-		ko.applyBindings(window.app.viewModel.testViewModel);
-	</script>
+        $("body").append(view);
+        ko.applyBindings(window.app.viewModel.testViewModel);
+    </script>
 </body>
 
 </html>

@@ -1,173 +1,115 @@
 window.app = window.app || {};
-window.app.fakeDataProvider = (function(){
+window.app.fakeDataProvider = window.app.fakeDataProvider || {};
+
+window.app.fakeDataProvider.referenceDataManager = {};
+window.app.fakeDataProvider.referenceDataManager.get = function () {
+    return [
+        {
+            itemText: "text1",
+            itemValue: 1
+        },
+        {
+            itemText: "text2",
+            itemValue: 2
+        }
+    ]
+}
+
+window.app.fakeDataProvider.create = function (settings) {
     var dataProvider = {
-        _items: [],
-        _getCopyOfItems: getCopyOfItems,
-        pageSize:12,
+        _needLoadReferenceData: true,
         getItemId: getItemId,
         setItemId: setItemId,
-        toEntity: toEntity,
-        getItems : getItems,
-        getItemsAjax : getItemsAjax,
-        saveChanges: saveChanges,
+        toDto: toDto,
+        processNewAddedItem: processNewAddedItem,
+        getItemsAjax: getItemsAjax,
         saveChangesAjax: saveChangesAjax
     };
-    
-    var d = new Date();
-    d.setHours(0,0,0,0)
-    for(var i=1; i<=105;i++){
-        d.setDate(d.getDate() + 1);
-        dataProvider._items.push({
-            column1:ko.observable(i),
-            column2:ko.observable("text " + i),
-            column3:ko.observable((i&1) === 0),
-            column4:ko.observable(i),
-            column5:ko.observable(new Date(d)),
-        });
-    }
+
     return dataProvider;
-    
-    function getCopyOfItems(){
-        var result = [];
-        for(var i=0; i<this._items.length;i++){
-            var item = this._items[i];
-            result.push({
-                column1:ko.observable(item.column1()),
-                column2:ko.observable(item.column2()),
-                column3:ko.observable(item.column3()),
-                column4:ko.observable(item.column4()),
-                column5:ko.observable(item.column5()),
+
+    function getItemId(item) {
+        return item[settings.keyProperty];
+    }
+
+    function setItemId(item, newId) {
+        item[settings.keyProperty](newId);
+    }
+
+    function toDto(item) {
+        var dto = {};
+        for (var i = 0; i < settings.itemProperties.length; i++) {
+            var propName = settings.itemProperties[i].name;
+            dto[propName] = ko.unwrap(item[propName]);
+        }
+        return dto;
+    }
+
+    function processNewAddedItem(item) {
+
+        if (settings.itemsSources != undefined) {
+            for (var i = 0; i < settings.itemsSources.length; i++) {
+                var itemsSource = settings.itemsSources[i];
+                item[itemsSource.name] = window.app.fakeDataProvider.referenceDataManager.get(itemsSource.controller);
+            }
+        }
+    }
+
+    function getItemsAjax(filter, done, fail) {
+        filter.pageSize = filter.pageSize || 30;
+
+        var data = {
+            items: [],
+            totalItemCount:15,
+            pageIndex: 1,
+            pageCount: 1
+        };
+        var d = new Date();
+        d.setHours(0, 0, 0, 0);
+        for (var i = 1; i <= 15; i++) {
+            d.setDate(d.getDate() + 1);
+            data.items.push({
+                column1: i,
+                column2: "text " + i,
+                column3: (i & 1) === 0,
+                column4: i,
+                column5: new Date(d),
             });
         }
-        return result;
+        done(processResponseData(data));
     }
-    
-    function getItemId(item){
-        return item.column1;
+
+    function saveChangesAjax(changes, done, fail) {
     }
-    
-    function setItemId(item, newId){
-        item.column1(newId);
-    }
-    
-    function toEntity(item){
-        return {
-            column1:ko.unwrap(item.column1),
-            column2:ko.unwrap(item.column2),
-            column3:ko.unwrap(item.column3),
-            column4:ko.unwrap(item.column4),
-            column5:ko.unwrap(item.column5),
-        };
-    }
-    
-    function getItems(filter){
+
+    function processResponseData(data) {
         var result = {
-            items:[],
-            totalItemCount:0,
-            pageIndex:filter.pageIndex,
-            pageCount:0
+            items: [],
+            totalItemCount: data.totalItemCount,
+            pageIndex: data.pageIndex,
+            pageCount: data.pageCount
         };
-        
-        var pageIndex = result.pageIndex;
-        if(pageIndex < 1){
-            pageIndex = 1;
-        }
-        
-        var filteredItems = filterItem(this._getCopyOfItems(), filter.whereOptions);
-        filteredItems = orderItems(filteredItems, filter.orderOptions);
-        
-        result.totalItemCount = filteredItems.length;
-        result.pageCount = Math.floor((result.totalItemCount + this.pageSize) / this.pageSize);
-        if(pageIndex > result.pageCount){
-            pageIndex = result.pageCount;
-        }
-        
-        var itemIndex = (pageIndex - 1) * this.pageSize;
-        var take = (itemIndex + this.pageSize) <= result.totalItemCount ? this.pageSize : result.totalItemCount - itemIndex;
-        for(var i=0; i < take; i++){
-            result.items.push(filteredItems[itemIndex + i]);
-        }
-        
-        result.pageIndex = pageIndex;
-        
-        var items = [];
-        for(var i=1; i<=105;i++){
-            items.push({itemText:"item " + i, itemValue: i});
-        }
-        result.comboBoxItemsSource = {};
-        result.comboBoxItemsSource.comboBoxItems = items;
-        return result;          
-    }
-    
-    function getItemsAjax(filter, done, fail){
-        var result = this.getItems(filter);
-        done(result);       
-    }
-    
-    function saveChanges(changes){
-        for(var i=0; i<changes.length; i++){
-            console.log(JSON.stringify(changes[i]));
-        }
-        return [1000];
-    }
-    
-    function saveChangesAjax(changes, done, fail){
-        var result = this.saveChanges(changes);
-        done(result);
-    }
-    
-    function filterItem(items, whereOptions){
-        var result = []
-        for(var i=0; i<items.length; i++){
-            var item = items[i];
-            var isValid = true;
-            for(var j=0; j<whereOptions.length; j++){
-                var w = whereOptions[j];
-                if(ko.unwrap(item[w.propertyPath]) != w.value){
-                    isValid = false;
-                    break;
+        var dataItems = data.items;
+        for (var i = 0; i < dataItems.length; i++) {
+            var item = dataItems[i];
+            var dto = {};
+            for (var j = 0; j < settings.itemProperties.length; j++) {
+                var prop = settings.itemProperties[j];
+                if (prop.type === "date") {
+                    dto[prop.name] = ko.observable(huypq.dateTimeUtils.createUTCDate(item[prop.name]))
+                } else {
+                    dto[prop.name] = ko.observable(item[prop.name]);
                 }
             }
-            if(isValid === true){
-                result.push(items[i]);
-            }
-        }
-        return result;
-    }
-    
-    function orderItems(items, orderOptions){
-        var result = []
-        for(var i=0; i<items.length; i++){
-            result.push(items[i]);
-        }
-        
-        if(orderOptions.length === 0){
-            return result;
-        }
-        
-        result.sort(function(a, b){
-            for(var j=0; j<orderOptions.length; j++){
-                var p = orderOptions[j].propertyPath;
-                var d = orderOptions[j].isAscending;
-                if(d){
-                    if(ko.unwrap(a[p]) < ko.unwrap(b[p])){
-                        return -1;
-                    }
-                    if(ko.unwrap(a[p]) > ko.unwrap(b[p])){
-                        return 1;
-                    }
-                }else{
-                    if(ko.unwrap(a[p]) < ko.unwrap(b[p])){
-                        return 1;
-                    }
-                    if(ko.unwrap(a[p]) > ko.unwrap(b[p])){
-                        return -1;
-                    }
+            if (settings.itemsSources != undefined) {
+                for (var j = 0; j < settings.itemsSources.length; j++) {
+                    var itemsSource = settings.itemsSources[j];
+                    dto[itemsSource.name] = window.app.fakeDataProvider.referenceDataManager.get(itemsSource.controller);
                 }
             }
-            return 0;
-        });
-        
+            result.items.push(dto);
+        }
+
         return result;
     }
-})();
+}

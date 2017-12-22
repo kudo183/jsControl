@@ -1,7 +1,20 @@
 ﻿window.app = window.app || {};
 window.app.viewModel = window.app.viewModel || {};
 window.app.viewModel.testViewModel = (function () {
-    var viewModel = huypq.control.dataGrid.createViewModel(window.app.fakeDataProvider, { hasDeleteButton: true });
+    var viewModel = huypq.control.dataGrid.createViewModel(window.app.fakeDataProvider.create({
+        keyProperty: "column1",
+        itemProperties: [
+            { name: "column1", type: "int" },
+            { name: "column2", type: "text" },
+            { name: "column3", type: "bool" },
+            { name: "column4", type: "int" },
+            { name: "column5", type: "date" }
+        ],
+        itemsSources: [
+            { name: "column4ItemsSource", controller: "column4" }
+        ],
+    }));
+
     viewModel.addColumn({
         headerText: "Col1",
         type: "span",
@@ -34,11 +47,13 @@ window.app.viewModel.testViewModel = (function () {
         type: "comboBox",
         cellValueProperty: "column4",
         readOnly: false,
-        itemsSourceName: "comboBoxItems",
+        itemsSourceName: "column4ItemsSource",
         itemText: "itemText",
         itemValue: "itemValue",
-        caption: "...",
-        filterValue: ko.observable()
+        //caption: "...",
+        order: 0,
+        filterValue: ko.observable(),
+        filterItemsSource: window.app.fakeDataProvider.referenceDataManager.get("column4")
     });
     viewModel.addColumn({
         headerText: "Col5",
@@ -85,14 +100,14 @@ window.app.viewModel.testViewModel = (function () {
             propertyPath: "column3",
             filterValue: ko.observable()
         },
-        {
-            type: "comboBox",
-            propertyPath: "column4",
-            itemsSourceName: "comboBoxItems",
-            itemText: "itemText",
-            itemValue: "itemValue",
-            filterValue: ko.observable()
-        }
+        //{
+        //    type: "comboBox",
+        //    propertyPath: "column4",
+        //    itemsSourceName: "column4ItemsSource",
+        //    itemText: "itemText",
+        //    itemValue: "itemValue",
+        //    filterValue: ko.observable()
+        //}
     ]);
     return viewModel;   
 })();
